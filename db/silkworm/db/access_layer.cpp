@@ -18,6 +18,8 @@
 
 #include <boost/endian/conversion.hpp>
 #include <cassert>
+#include <silkworm/types/log_cbor.hpp>
+#include <silkworm/types/receipt_cbor.hpp>
 
 #include "history_index.hpp"
 #include "tables.hpp"
@@ -387,6 +389,18 @@ bool read_storage_mode_receipts(lmdb::Transaction& txn) {
 bool migration_happened(lmdb::Transaction& txn, const char* name) {
     auto tbl{txn.open(table::kMigrations)};
     return tbl->get(byte_view_of_c_str(name)).has_value();
+}
+
+void append_receipts(lmdb::Transaction& txn, uint64_t block_number, const std::vector<Receipt>& receipts) {
+    auto log_table{txn.open(table::kLogs)};
+    for (uint32_t i{0}; i < receipts.size(); ++i) {
+        if (!receipts[i].logs.empty()) {
+            log_table->put(log_key(block_number, i), cbor_encode(receipts[i].logs), MDB_APPEND);
+        }
+    }
+
+    auto receipt_table{txn.open(table::kBlockReceipts)};
+    receipt_table->put(block_key(block_number), cbor_encode(receipts), MDB_APPEND);
 }
 
 }  // namespace silkworm::db

@@ -73,8 +73,6 @@ class Buffer : public StateBuffer {
 
     void decanonize_block(uint64_t block_number) override;
 
-    void insert_receipts(uint64_t block_number, const std::vector<Receipt>& receipts) override;
-
     /** @name State changes
      *  Change sets are backward changes of the state, i.e. account/storage values <em>at the beginning of a block</em>.
      */
@@ -133,8 +131,6 @@ class Buffer : public StateBuffer {
     absl::btree_map<evmc::address, uint64_t> incarnations_;
     absl::btree_map<evmc::bytes32, Bytes> hash_to_code_;
     absl::btree_map<Bytes, evmc::bytes32> storage_prefix_to_code_hash_;
-    absl::btree_map<Bytes, Bytes> receipts_;
-    absl::btree_map<Bytes, Bytes> logs_;
 
     size_t batch_size_{0};
 

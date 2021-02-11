@@ -69,8 +69,6 @@ class StateBuffer {
 
     virtual void decanonize_block(uint64_t block_number) = 0;
 
-    virtual void insert_receipts(uint64_t block_number, const std::vector<Receipt>& receipts) = 0;
-
     /** @name State changes
      *  Change sets are backward changes of the state, i.e. account/storage values <em>at the beginning of a block</em>.
      */

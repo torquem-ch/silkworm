@@ -25,6 +25,7 @@
 #include <silkworm/db/util.hpp>
 #include <silkworm/types/account.hpp>
 #include <silkworm/types/block.hpp>
+#include <silkworm/types/receipt.hpp>
 #include <vector>
 
 namespace silkworm::db {
@@ -80,6 +81,9 @@ AccountChanges read_account_changes(lmdb::Transaction& txn, uint64_t block_numbe
 StorageChanges read_storage_changes(lmdb::Transaction& txn, uint64_t block_number);
 
 bool migration_happened(lmdb::Transaction& txn, const char* name);
+
+// See TG AppendReceipts in core/rawdb/accessors_chain.go
+void append_receipts(lmdb::Transaction& txn, uint64_t block_number, const std::vector<Receipt>& receipts);
 
 }  // namespace silkworm::db
 

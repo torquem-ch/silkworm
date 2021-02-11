@@ -55,8 +55,6 @@ class MemoryBuffer : public StateBuffer {
 
     void decanonize_block(uint64_t block_number) override;
 
-    void insert_receipts(uint64_t block_number, const std::vector<Receipt>& receipts) override;
-
     void begin_block(uint64_t block_number) override;
 
     void update_account(const evmc::address& address, std::optional<Account> initial,

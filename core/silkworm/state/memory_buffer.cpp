@@ -147,8 +147,6 @@ void MemoryBuffer::canonize_block(uint64_t block_number, const evmc::bytes32& bl
 
 void MemoryBuffer::decanonize_block(uint64_t block_number) { canonical_hashes_.resize(block_number); }
 
-void MemoryBuffer::insert_receipts(uint64_t, const std::vector<Receipt>&) {}
-
 void MemoryBuffer::begin_block(uint64_t block_number) {
     block_number_ = block_number;
     account_changes_.erase(block_number);

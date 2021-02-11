@@ -21,8 +21,6 @@
 #include <algorithm>
 #include <boost/endian/conversion.hpp>
 #include <silkworm/common/util.hpp>
-#include <silkworm/types/log_cbor.hpp>
-#include <silkworm/types/receipt_cbor.hpp>
 
 #include "access_layer.hpp"
 #include "tables.hpp"
@@ -208,39 +206,6 @@ void Buffer::write_to_db() {
                 }
             }
         }
-    }
-
-    auto receipt_table{txn_->open(table::kBlockReceipts)};
-    for (const auto& entry : receipts_) {
-        receipt_table->put(entry.first, entry.second);
-    }
-
-    auto log_table{txn_->open(table::kLogs)};
-    for (const auto& entry : logs_) {
-        log_table->put(entry.first, entry.second);
-    }
-}
-
-// TG WriteReceipts in core/rawdb/accessors_chain.go
-void Buffer::insert_receipts(uint64_t block_number, const std::vector<Receipt>& receipts) {
-    for (uint32_t i{0}; i < receipts.size(); ++i) {
-        if (receipts[i].logs.empty()) {
-            continue;
-        }
-
-        Bytes key{log_key(block_number, i)};
-        Bytes value{cbor_encode(receipts[i].logs)};
-
-        if (logs_.insert_or_assign(key, value).second) {
-            bump_batch_size(key.size(), value.size());
-        }
-    }
-
-    Bytes key{block_key(block_number)};
-    Bytes value{cbor_encode(receipts)};
-
-    if (receipts_.insert_or_assign(key, value).second) {
-        bump_batch_size(key.size(), value.size());
     }
 }
 
