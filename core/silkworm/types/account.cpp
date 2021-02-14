@@ -21,7 +21,6 @@
 namespace silkworm {
 
 bool operator==(const Account& a, const Account& b) {
-    // Intentionally omit storage_root
     return a.nonce == b.nonce && a.balance == b.balance && a.code_hash == b.code_hash && a.incarnation == b.incarnation;
 }
 
@@ -144,48 +143,22 @@ std::pair<Account, rlp::DecodingResult> decode_account_from_storage(ByteView enc
     return {a, rlp::DecodingResult::kOk};
 }
 
-namespace rlp {
+Bytes Account::rlp(const evmc::bytes32& storage_root) const {
+    rlp::Header h{true, 0};
+    h.payload_length += rlp::length(nonce);
+    h.payload_length += rlp::length(balance);
+    h.payload_length += kHashLength + 1;
+    h.payload_length += kHashLength + 1;
 
-    void encode(Bytes& to, const Account& account) {
-        Header h{true, 0};
-        h.payload_length += length(account.nonce);
-        h.payload_length += length(account.balance);
-        h.payload_length += kHashLength + 1;
-        h.payload_length += kHashLength + 1;
+    Bytes to;
 
-        encode_header(to, h);
-        encode(to, account.nonce);
-        encode(to, account.balance);
-        encode(to, account.storage_root.bytes);
-        encode(to, account.code_hash.bytes);
-    }
+    rlp::encode_header(to, h);
+    rlp::encode(to, nonce);
+    rlp::encode(to, balance);
+    rlp::encode(to, storage_root.bytes);
+    rlp::encode(to, code_hash.bytes);
 
-    template <>
-    DecodingResult decode(ByteView& from, Account& to) noexcept {
-        auto [h, err]{decode_header(from)};
-        if (err != DecodingResult::kOk) {
-            return err;
-        }
-        if (!h.list) {
-            return DecodingResult::kUnexpectedString;
-        }
-        uint64_t leftover{from.length() - h.payload_length};
+    return to;
+}
 
-        if (DecodingResult err{decode(from, to.nonce)}; err != DecodingResult::kOk) {
-            return err;
-        }
-        if (DecodingResult err{decode(from, to.balance)}; err != DecodingResult::kOk) {
-            return err;
-        }
-        if (DecodingResult err{decode(from, to.storage_root.bytes)}; err != DecodingResult::kOk) {
-            return err;
-        }
-        if (DecodingResult err{decode(from, to.code_hash.bytes)}; err != DecodingResult::kOk) {
-            return err;
-        }
-
-        return from.length() == leftover ? DecodingResult::kOk : DecodingResult::kListLengthMismatch;
-    }
-
-}  // namespace rlp
 }  // namespace silkworm

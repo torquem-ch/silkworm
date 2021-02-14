@@ -21,23 +21,6 @@
 
 namespace silkworm {
 
-TEST_CASE("Account RLP") {
-    Account account{
-        12,                                                                          // nonce
-        200 * kEther,                                                                // balance
-        0xdde806bc028ddb3c73ddfbe1e19676224198e5d2cb205edb40e26da2a5310d5f_bytes32,  // storage_root
-        0x12580ee5fc5ea05a1a19a93cbc51830ae3607690b7c4a6996ea211aba5a966b2_bytes32,  // code_hash
-    };
-
-    Bytes encoded{};
-    rlp::encode(encoded, account);
-
-    Account decoded;
-    ByteView view{encoded};
-    REQUIRE(rlp::decode<Account>(view, decoded) == rlp::DecodingResult::kOk);
-    CHECK(decoded == account);
-}
-
 TEST_CASE("Decode account from storage") {
     Bytes encoded{*from_hex("0f01020203e8010520f1885eda54b7a053318cd41e2093220dab15d65381b1157a3633a83bfd5c9239")};
 
@@ -46,7 +29,6 @@ TEST_CASE("Decode account from storage") {
 
     CHECK(decoded.nonce == 2);
     CHECK(decoded.balance == 1000);
-    CHECK(decoded.storage_root == kEmptyRoot);
     CHECK(decoded.code_hash == 0xf1885eda54b7a053318cd41e2093220dab15d65381b1157a3633a83bfd5c9239_bytes32);
     CHECK(decoded.incarnation == 5);
 

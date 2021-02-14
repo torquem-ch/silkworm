@@ -26,7 +26,6 @@ namespace silkworm {
 struct Account {
     uint64_t nonce{0};
     intx::uint256 balance;
-    evmc::bytes32 storage_root{kEmptyRoot};
     evmc::bytes32 code_hash{kEmptyHash};
     uint64_t incarnation{0};
 
@@ -35,6 +34,8 @@ struct Account {
 
     // Turbo-Geth (*Account)EncodingLengthForStorage
     size_t encoding_length_for_storage() const;
+
+    Bytes rlp(const evmc::bytes32& storage_root) const;
 };
 
 bool operator==(const Account& a, const Account& b);
@@ -42,12 +43,6 @@ bool operator==(const Account& a, const Account& b);
 // Turbo-Geth (*Account)DecodeForStorage
 [[nodiscard]] std::pair<Account, rlp::DecodingResult> decode_account_from_storage(ByteView encoded) noexcept;
 
-namespace rlp {
-    void encode(Bytes& to, const Account& account);
-
-    template <>
-    DecodingResult decode(ByteView& from, Account& to) noexcept;
-}  // namespace rlp
 }  // namespace silkworm
 
 #endif  // SILKWORM_TYPES_ACCOUNT_H_

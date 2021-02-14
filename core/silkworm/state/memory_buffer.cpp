@@ -260,14 +260,10 @@ evmc::bytes32 MemoryBuffer::state_root_hash() const {
     }
 
     std::map<evmc::bytes32, Bytes> account_rlp;
-    Bytes rlp;
     for (const auto& [address, account] : accounts_) {
         ethash::hash256 hash{keccak256(full_view(address))};
-        Account copy{account};
-        copy.storage_root = account_storage_root(address, account.incarnation);
-        rlp.clear();
-        rlp::encode(rlp, copy);
-        account_rlp[to_bytes32(full_view(hash.bytes))] = rlp;
+        evmc::bytes32 storage_root{account_storage_root(address, account.incarnation)};
+        account_rlp[to_bytes32(full_view(hash.bytes))] = account.rlp(storage_root);
     }
 
     auto it{account_rlp.cbegin()};
