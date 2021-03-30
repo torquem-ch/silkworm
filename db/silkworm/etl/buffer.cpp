@@ -18,6 +18,11 @@
 
 namespace silkworm::etl {
 
+Buffer::Buffer(size_t optimal_size): optimal_size_(optimal_size) {
+    entries_.reserve(kInitialBufferCap);
+
+}
+
 void Buffer::put(Entry& entry) {
     size_ += entry.size();
     entries_.push_back(std::move(entry));
