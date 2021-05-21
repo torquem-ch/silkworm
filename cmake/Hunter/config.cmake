@@ -37,3 +37,6 @@ hunter_config(
     URL https://github.com/microsoft/GSL/archive/v3.1.0.tar.gz
     SHA1 3f2891a46595806563e7a0e25bb7ecbb30776445
 )
+
+hunter_config(Protobuf VERSION 3.12.4-p1)  # <-- Last working version (greater seems to have networking issues)
+hunter_config(gRPC VERSION 1.31.0-p0)      # <-- Last working version (greater seems to have networking issues)

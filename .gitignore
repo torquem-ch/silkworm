@@ -3,3 +3,8 @@ xcode
 .idea
 .vscode
 .vs
+.idea
+cmake-build-debug
+cmake-build-release
+CMakeFiles
+Makefile

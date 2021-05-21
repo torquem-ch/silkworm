@@ -1,5 +1,5 @@
-#[[
-   Copyright 2020 The Silkworm Authors
+/*
+   Copyright 2021 The Silkworm Authors
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -12,11 +12,18 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-]]
+*/
 
-hunter_add_package(Catch)
-hunter_add_package(intx)
-hunter_add_package(Microsoft.GSL)
-hunter_add_package(nlohmann_json)
-hunter_add_package(gRPC)
-hunter_add_package(Protobuf)
+#ifndef SILKWORM_CONCURRENTCONTAINERS_HPP
+#define SILKWORM_CONCURRENTCONTAINERS_HPP
+
+/*
+ * Decisions about concurrent containers
+ */
+
+#include "ThreadSafeQueue.hpp"
+
+template <typename T>
+using ConcurrentQueue = ThreadSafeQueue<T>;  // todo: use a better alternative from a known library (Intel oneTBB concurrent_queue<T>?)
+
+#endif  // SILKWORM_CONCURRENTCONTAINERS_HPP
