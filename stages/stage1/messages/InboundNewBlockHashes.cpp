@@ -15,14 +15,20 @@
 */
 
 #include "InboundNewBlockHashes.hpp"
+#include "stages/stage1/rpc/SendMessageById.hpp"
+#include "stages/stage1/RandomNumber.hpp"
 #include "stages/stage1/stage1.hpp"
+#include <silkworm/common/log.hpp>
 #include <algorithm>
+#include "stages/stage1/packets/RLPEth66PacketCoding.hpp"
 
 namespace silkworm {
 
 InboundNewBlockHashes::InboundNewBlockHashes(const sentry::InboundMessage& msg): InboundMessage() {
-    if (msg.id() != sentry::MessageId::NewBlockHashes)
+    if (msg.id() != sentry::MessageId::NEW_BLOCK_HASHES_66)
         throw std::logic_error("InboundNewBlockHashes received wrong InboundMessage");
+
+    reqId_ = RANDOM_NUMBER.generate_one();  // for trace purposes
 
     peerId_ = string_from_H512(msg.peer_id());
 
@@ -32,19 +38,51 @@ InboundNewBlockHashes::InboundNewBlockHashes(const sentry::InboundMessage& msg):
         throw rlp::rlp_error("rlp decoding error decoding NewBlockHashes");
 }
 
-InboundMessage::reply_call_t InboundNewBlockHashes::execute() {
+InboundMessage::reply_calls_t InboundNewBlockHashes::execute() {
     using namespace std;
 
     BlockNum max = STAGE1.working_chain().top_seen_block_height();
+
+    reply_calls_t calls;
+
     for(size_t i = 0; i < packet_.size(); i++) {
-        BlockNum current = packet_[i].number;
-        max = std::max(max, current);
+        Hash hash = packet_[i].hash;
+
+        // save announcement
+        STAGE1.working_chain().save_external_announce(hash);
+        if (STAGE1.working_chain().has_link(hash))
+            continue;
+
+        // request header
+        GetBlockHeadersPacket66 reply;
+        reply.requestId = RANDOM_NUMBER.generate_one();
+        reply.request.origin = hash;
+        reply.request.amount = 1;
+        reply.request.skip = 0;
+        reply.request.reverse = false;
+
+        Bytes rlp_encoding;
+        rlp::encode(rlp_encoding, reply);
+
+        auto msg_reply = std::make_unique<sentry::OutboundMessageData>();
+        msg_reply->set_id(sentry::MessageId::GET_BLOCK_HEADERS_66);
+        msg_reply->set_data(rlp_encoding.data(), rlp_encoding.length()); // copy
+
+        auto rpc = rpc::SendMessageById::make(peerId_, std::move(msg_reply));
+
+        calls.push_back(rpc);
+
+        // calculate top seen block height
+        max = std::max(max, packet_[i].number);
     }
+
     STAGE1.working_chain().top_seen_block_height(max);
 
-    // todo: implements rest of processing if any! (see TG)
+    return calls;
+}
 
-    return nullptr;
+uint64_t InboundNewBlockHashes::reqId() const {
+    return reqId_;
 }
 
 std::string InboundNewBlockHashes::content() const {

@@ -78,39 +78,21 @@ class Sentry final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SentPeers>> PrepareAsyncSendMessageToAll(::grpc::ClientContext* context, const ::sentry::OutboundMessageData& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SentPeers>>(PrepareAsyncSendMessageToAllRaw(context, request, cq));
     }
-    virtual ::grpc::Status SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::google::protobuf::Empty* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> AsyncSetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(AsyncSetStatusRaw(context, request, cq));
+    virtual ::grpc::Status SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::sentry::SetStatusReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SetStatusReply>> AsyncSetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SetStatusReply>>(AsyncSetStatusRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncSetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncSetStatusRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SetStatusReply>> PrepareAsyncSetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SetStatusReply>>(PrepareAsyncSetStatusRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientReaderInterface< ::sentry::InboundMessage>> ReceiveMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-      return std::unique_ptr< ::grpc::ClientReaderInterface< ::sentry::InboundMessage>>(ReceiveMessagesRaw(context, request));
+    std::unique_ptr< ::grpc::ClientReaderInterface< ::sentry::InboundMessage>> Messages(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request) {
+      return std::unique_ptr< ::grpc::ClientReaderInterface< ::sentry::InboundMessage>>(MessagesRaw(context, request));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>> AsyncReceiveMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>>(AsyncReceiveMessagesRaw(context, request, cq, tag));
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>> AsyncMessages(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>>(AsyncMessagesRaw(context, request, cq, tag));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>> PrepareAsyncReceiveMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>>(PrepareAsyncReceiveMessagesRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientReaderInterface< ::sentry::InboundMessage>> ReceiveUploadMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-      return std::unique_ptr< ::grpc::ClientReaderInterface< ::sentry::InboundMessage>>(ReceiveUploadMessagesRaw(context, request));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>> AsyncReceiveUploadMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>>(AsyncReceiveUploadMessagesRaw(context, request, cq, tag));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>> PrepareAsyncReceiveUploadMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>>(PrepareAsyncReceiveUploadMessagesRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientReaderInterface< ::sentry::InboundMessage>> ReceiveTxMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-      return std::unique_ptr< ::grpc::ClientReaderInterface< ::sentry::InboundMessage>>(ReceiveTxMessagesRaw(context, request));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>> AsyncReceiveTxMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>>(AsyncReceiveTxMessagesRaw(context, request, cq, tag));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>> PrepareAsyncReceiveTxMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>>(PrepareAsyncReceiveTxMessagesRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>> PrepareAsyncMessages(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>>(PrepareAsyncMessagesRaw(context, request, cq));
     }
     class experimental_async_interface {
      public:
@@ -187,32 +169,22 @@ class Sentry final {
       #else
       virtual void SendMessageToAll(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SentPeers* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       #endif
-      virtual void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SetStatusReply* response, std::function<void(::grpc::Status)>) = 0;
       #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      virtual void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       #else
-      virtual void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       #endif
       #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      virtual void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SetStatusReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       #else
-      virtual void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::google::protobuf::Empty* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SetStatusReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       #endif
       #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      virtual void ReceiveMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::ClientReadReactor< ::sentry::InboundMessage>* reactor) = 0;
+      virtual void Messages(::grpc::ClientContext* context, ::sentry::MessagesRequest* request, ::grpc::ClientReadReactor< ::sentry::InboundMessage>* reactor) = 0;
       #else
-      virtual void ReceiveMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) = 0;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      virtual void ReceiveUploadMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::ClientReadReactor< ::sentry::InboundMessage>* reactor) = 0;
-      #else
-      virtual void ReceiveUploadMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) = 0;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      virtual void ReceiveTxMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::ClientReadReactor< ::sentry::InboundMessage>* reactor) = 0;
-      #else
-      virtual void ReceiveTxMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) = 0;
+      virtual void Messages(::grpc::ClientContext* context, ::sentry::MessagesRequest* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) = 0;
       #endif
     };
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
@@ -235,17 +207,11 @@ class Sentry final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SentPeers>* PrepareAsyncSendMessageToRandomPeersRaw(::grpc::ClientContext* context, const ::sentry::SendMessageToRandomPeersRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SentPeers>* AsyncSendMessageToAllRaw(::grpc::ClientContext* context, const ::sentry::OutboundMessageData& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SentPeers>* PrepareAsyncSendMessageToAllRaw(::grpc::ClientContext* context, const ::sentry::OutboundMessageData& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* AsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientReaderInterface< ::sentry::InboundMessage>* ReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) = 0;
-    virtual ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>* AsyncReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
-    virtual ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>* PrepareAsyncReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientReaderInterface< ::sentry::InboundMessage>* ReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) = 0;
-    virtual ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>* AsyncReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
-    virtual ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>* PrepareAsyncReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientReaderInterface< ::sentry::InboundMessage>* ReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) = 0;
-    virtual ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>* AsyncReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
-    virtual ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>* PrepareAsyncReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SetStatusReply>* AsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::sentry::SetStatusReply>* PrepareAsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientReaderInterface< ::sentry::InboundMessage>* MessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>* AsyncMessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::sentry::InboundMessage>* PrepareAsyncMessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -292,39 +258,21 @@ class Sentry final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::sentry::SentPeers>> PrepareAsyncSendMessageToAll(::grpc::ClientContext* context, const ::sentry::OutboundMessageData& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::sentry::SentPeers>>(PrepareAsyncSendMessageToAllRaw(context, request, cq));
     }
-    ::grpc::Status SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::google::protobuf::Empty* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> AsyncSetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(AsyncSetStatusRaw(context, request, cq));
+    ::grpc::Status SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::sentry::SetStatusReply* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::sentry::SetStatusReply>> AsyncSetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::sentry::SetStatusReply>>(AsyncSetStatusRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncSetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncSetStatusRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::sentry::SetStatusReply>> PrepareAsyncSetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::sentry::SetStatusReply>>(PrepareAsyncSetStatusRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientReader< ::sentry::InboundMessage>> ReceiveMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-      return std::unique_ptr< ::grpc::ClientReader< ::sentry::InboundMessage>>(ReceiveMessagesRaw(context, request));
+    std::unique_ptr< ::grpc::ClientReader< ::sentry::InboundMessage>> Messages(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request) {
+      return std::unique_ptr< ::grpc::ClientReader< ::sentry::InboundMessage>>(MessagesRaw(context, request));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>> AsyncReceiveMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>>(AsyncReceiveMessagesRaw(context, request, cq, tag));
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>> AsyncMessages(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>>(AsyncMessagesRaw(context, request, cq, tag));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>> PrepareAsyncReceiveMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>>(PrepareAsyncReceiveMessagesRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientReader< ::sentry::InboundMessage>> ReceiveUploadMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-      return std::unique_ptr< ::grpc::ClientReader< ::sentry::InboundMessage>>(ReceiveUploadMessagesRaw(context, request));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>> AsyncReceiveUploadMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>>(AsyncReceiveUploadMessagesRaw(context, request, cq, tag));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>> PrepareAsyncReceiveUploadMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>>(PrepareAsyncReceiveUploadMessagesRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientReader< ::sentry::InboundMessage>> ReceiveTxMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-      return std::unique_ptr< ::grpc::ClientReader< ::sentry::InboundMessage>>(ReceiveTxMessagesRaw(context, request));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>> AsyncReceiveTxMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>>(AsyncReceiveTxMessagesRaw(context, request, cq, tag));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>> PrepareAsyncReceiveTxMessages(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>>(PrepareAsyncReceiveTxMessagesRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>> PrepareAsyncMessages(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::sentry::InboundMessage>>(PrepareAsyncMessagesRaw(context, request, cq));
     }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
@@ -401,32 +349,22 @@ class Sentry final {
       #else
       void SendMessageToAll(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SentPeers* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       #endif
-      void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
-      void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
+      void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response, std::function<void(::grpc::Status)>) override;
+      void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SetStatusReply* response, std::function<void(::grpc::Status)>) override;
       #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response, ::grpc::ClientUnaryReactor* reactor) override;
       #else
-      void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       #endif
       #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SetStatusReply* response, ::grpc::ClientUnaryReactor* reactor) override;
       #else
-      void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::google::protobuf::Empty* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SetStatusReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       #endif
       #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      void ReceiveMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::ClientReadReactor< ::sentry::InboundMessage>* reactor) override;
+      void Messages(::grpc::ClientContext* context, ::sentry::MessagesRequest* request, ::grpc::ClientReadReactor< ::sentry::InboundMessage>* reactor) override;
       #else
-      void ReceiveMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) override;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      void ReceiveUploadMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::ClientReadReactor< ::sentry::InboundMessage>* reactor) override;
-      #else
-      void ReceiveUploadMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) override;
-      #endif
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      void ReceiveTxMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::ClientReadReactor< ::sentry::InboundMessage>* reactor) override;
-      #else
-      void ReceiveTxMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) override;
+      void Messages(::grpc::ClientContext* context, ::sentry::MessagesRequest* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) override;
       #endif
      private:
       friend class Stub;
@@ -451,17 +389,11 @@ class Sentry final {
     ::grpc::ClientAsyncResponseReader< ::sentry::SentPeers>* PrepareAsyncSendMessageToRandomPeersRaw(::grpc::ClientContext* context, const ::sentry::SendMessageToRandomPeersRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::sentry::SentPeers>* AsyncSendMessageToAllRaw(::grpc::ClientContext* context, const ::sentry::OutboundMessageData& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::sentry::SentPeers>* PrepareAsyncSendMessageToAllRaw(::grpc::ClientContext* context, const ::sentry::OutboundMessageData& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* AsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientReader< ::sentry::InboundMessage>* ReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) override;
-    ::grpc::ClientAsyncReader< ::sentry::InboundMessage>* AsyncReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) override;
-    ::grpc::ClientAsyncReader< ::sentry::InboundMessage>* PrepareAsyncReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientReader< ::sentry::InboundMessage>* ReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) override;
-    ::grpc::ClientAsyncReader< ::sentry::InboundMessage>* AsyncReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) override;
-    ::grpc::ClientAsyncReader< ::sentry::InboundMessage>* PrepareAsyncReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientReader< ::sentry::InboundMessage>* ReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) override;
-    ::grpc::ClientAsyncReader< ::sentry::InboundMessage>* AsyncReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) override;
-    ::grpc::ClientAsyncReader< ::sentry::InboundMessage>* PrepareAsyncReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::sentry::SetStatusReply>* AsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::sentry::SetStatusReply>* PrepareAsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientReader< ::sentry::InboundMessage>* MessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request) override;
+    ::grpc::ClientAsyncReader< ::sentry::InboundMessage>* AsyncMessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq, void* tag) override;
+    ::grpc::ClientAsyncReader< ::sentry::InboundMessage>* PrepareAsyncMessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_PenalizePeer_;
     const ::grpc::internal::RpcMethod rpcmethod_PeerMinBlock_;
     const ::grpc::internal::RpcMethod rpcmethod_SendMessageByMinBlock_;
@@ -469,9 +401,7 @@ class Sentry final {
     const ::grpc::internal::RpcMethod rpcmethod_SendMessageToRandomPeers_;
     const ::grpc::internal::RpcMethod rpcmethod_SendMessageToAll_;
     const ::grpc::internal::RpcMethod rpcmethod_SetStatus_;
-    const ::grpc::internal::RpcMethod rpcmethod_ReceiveMessages_;
-    const ::grpc::internal::RpcMethod rpcmethod_ReceiveUploadMessages_;
-    const ::grpc::internal::RpcMethod rpcmethod_ReceiveTxMessages_;
+    const ::grpc::internal::RpcMethod rpcmethod_Messages_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -485,10 +415,8 @@ class Sentry final {
     virtual ::grpc::Status SendMessageById(::grpc::ServerContext* context, const ::sentry::SendMessageByIdRequest* request, ::sentry::SentPeers* response);
     virtual ::grpc::Status SendMessageToRandomPeers(::grpc::ServerContext* context, const ::sentry::SendMessageToRandomPeersRequest* request, ::sentry::SentPeers* response);
     virtual ::grpc::Status SendMessageToAll(::grpc::ServerContext* context, const ::sentry::OutboundMessageData* request, ::sentry::SentPeers* response);
-    virtual ::grpc::Status SetStatus(::grpc::ServerContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response);
-    virtual ::grpc::Status ReceiveMessages(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::grpc::ServerWriter< ::sentry::InboundMessage>* writer);
-    virtual ::grpc::Status ReceiveUploadMessages(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::grpc::ServerWriter< ::sentry::InboundMessage>* writer);
-    virtual ::grpc::Status ReceiveTxMessages(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::grpc::ServerWriter< ::sentry::InboundMessage>* writer);
+    virtual ::grpc::Status SetStatus(::grpc::ServerContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response);
+    virtual ::grpc::Status Messages(::grpc::ServerContext* context, const ::sentry::MessagesRequest* request, ::grpc::ServerWriter< ::sentry::InboundMessage>* writer);
   };
   template <class BaseClass>
   class WithAsyncMethod_PenalizePeer : public BaseClass {
@@ -622,75 +550,35 @@ class Sentry final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::sentry::SetStatusReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestSetStatus(::grpc::ServerContext* context, ::sentry::StatusData* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestSetStatus(::grpc::ServerContext* context, ::sentry::StatusData* request, ::grpc::ServerAsyncResponseWriter< ::sentry::SetStatusReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class WithAsyncMethod_ReceiveMessages : public BaseClass {
+  class WithAsyncMethod_Messages : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithAsyncMethod_ReceiveMessages() {
+    WithAsyncMethod_Messages() {
       ::grpc::Service::MarkMethodAsync(7);
     }
-    ~WithAsyncMethod_ReceiveMessages() override {
+    ~WithAsyncMethod_Messages() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReceiveMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
+    ::grpc::Status Messages(::grpc::ServerContext* /*context*/, const ::sentry::MessagesRequest* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestReceiveMessages(::grpc::ServerContext* context, ::google::protobuf::Empty* request, ::grpc::ServerAsyncWriter< ::sentry::InboundMessage>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestMessages(::grpc::ServerContext* context, ::sentry::MessagesRequest* request, ::grpc::ServerAsyncWriter< ::sentry::InboundMessage>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncServerStreaming(7, context, request, writer, new_call_cq, notification_cq, tag);
     }
   };
-  template <class BaseClass>
-  class WithAsyncMethod_ReceiveUploadMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_ReceiveUploadMessages() {
-      ::grpc::Service::MarkMethodAsync(8);
-    }
-    ~WithAsyncMethod_ReceiveUploadMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveUploadMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestReceiveUploadMessages(::grpc::ServerContext* context, ::google::protobuf::Empty* request, ::grpc::ServerAsyncWriter< ::sentry::InboundMessage>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncServerStreaming(8, context, request, writer, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_ReceiveTxMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_ReceiveTxMessages() {
-      ::grpc::Service::MarkMethodAsync(9);
-    }
-    ~WithAsyncMethod_ReceiveTxMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveTxMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestReceiveTxMessages(::grpc::ServerContext* context, ::google::protobuf::Empty* request, ::grpc::ServerAsyncWriter< ::sentry::InboundMessage>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncServerStreaming(9, context, request, writer, new_call_cq, notification_cq, tag);
-    }
-  };
-  typedef WithAsyncMethod_PenalizePeer<WithAsyncMethod_PeerMinBlock<WithAsyncMethod_SendMessageByMinBlock<WithAsyncMethod_SendMessageById<WithAsyncMethod_SendMessageToRandomPeers<WithAsyncMethod_SendMessageToAll<WithAsyncMethod_SetStatus<WithAsyncMethod_ReceiveMessages<WithAsyncMethod_ReceiveUploadMessages<WithAsyncMethod_ReceiveTxMessages<Service > > > > > > > > > > AsyncService;
+  typedef WithAsyncMethod_PenalizePeer<WithAsyncMethod_PeerMinBlock<WithAsyncMethod_SendMessageByMinBlock<WithAsyncMethod_SendMessageById<WithAsyncMethod_SendMessageToRandomPeers<WithAsyncMethod_SendMessageToAll<WithAsyncMethod_SetStatus<WithAsyncMethod_Messages<Service > > > > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_PenalizePeer : public BaseClass {
    private:
@@ -985,160 +873,84 @@ class Sentry final {
       ::grpc::Service::experimental().
     #endif
         MarkMethodCallback(6,
-          new ::grpc_impl::internal::CallbackUnaryHandler< ::sentry::StatusData, ::google::protobuf::Empty>(
+          new ::grpc_impl::internal::CallbackUnaryHandler< ::sentry::StatusData, ::sentry::SetStatusReply>(
             [this](
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
                    ::grpc::CallbackServerContext*
     #else
                    ::grpc::experimental::CallbackServerContext*
     #endif
-                     context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response) { return this->SetStatus(context, request, response); }));}
+                     context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response) { return this->SetStatus(context, request, response); }));}
     void SetMessageAllocatorFor_SetStatus(
-        ::grpc::experimental::MessageAllocator< ::sentry::StatusData, ::google::protobuf::Empty>* allocator) {
+        ::grpc::experimental::MessageAllocator< ::sentry::StatusData, ::sentry::SetStatusReply>* allocator) {
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(6);
     #else
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(6);
     #endif
-      static_cast<::grpc_impl::internal::CallbackUnaryHandler< ::sentry::StatusData, ::google::protobuf::Empty>*>(handler)
+      static_cast<::grpc_impl::internal::CallbackUnaryHandler< ::sentry::StatusData, ::sentry::SetStatusReply>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_SetStatus() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::sentry::SetStatusReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     virtual ::grpc::ServerUnaryReactor* SetStatus(
-      ::grpc::CallbackServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::google::protobuf::Empty* /*response*/)
+      ::grpc::CallbackServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::sentry::SetStatusReply* /*response*/)
     #else
     virtual ::grpc::experimental::ServerUnaryReactor* SetStatus(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::google::protobuf::Empty* /*response*/)
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::sentry::SetStatusReply* /*response*/)
     #endif
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_ReceiveMessages : public BaseClass {
+  class ExperimentalWithCallbackMethod_Messages : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithCallbackMethod_ReceiveMessages() {
+    ExperimentalWithCallbackMethod_Messages() {
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       ::grpc::Service::
     #else
       ::grpc::Service::experimental().
     #endif
         MarkMethodCallback(7,
-          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::google::protobuf::Empty, ::sentry::InboundMessage>(
+          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::sentry::MessagesRequest, ::sentry::InboundMessage>(
             [this](
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
                    ::grpc::CallbackServerContext*
     #else
                    ::grpc::experimental::CallbackServerContext*
     #endif
-                     context, const ::google::protobuf::Empty* request) { return this->ReceiveMessages(context, request); }));
+                     context, const ::sentry::MessagesRequest* request) { return this->Messages(context, request); }));
     }
-    ~ExperimentalWithCallbackMethod_ReceiveMessages() override {
+    ~ExperimentalWithCallbackMethod_Messages() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReceiveMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
+    ::grpc::Status Messages(::grpc::ServerContext* /*context*/, const ::sentry::MessagesRequest* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerWriteReactor< ::sentry::InboundMessage>* ReceiveMessages(
-      ::grpc::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/)
+    virtual ::grpc::ServerWriteReactor< ::sentry::InboundMessage>* Messages(
+      ::grpc::CallbackServerContext* /*context*/, const ::sentry::MessagesRequest* /*request*/)
     #else
-    virtual ::grpc::experimental::ServerWriteReactor< ::sentry::InboundMessage>* ReceiveMessages(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/)
-    #endif
-      { return nullptr; }
-  };
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_ReceiveUploadMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    ExperimentalWithCallbackMethod_ReceiveUploadMessages() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(8,
-          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::google::protobuf::Empty, ::sentry::InboundMessage>(
-            [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::google::protobuf::Empty* request) { return this->ReceiveUploadMessages(context, request); }));
-    }
-    ~ExperimentalWithCallbackMethod_ReceiveUploadMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveUploadMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerWriteReactor< ::sentry::InboundMessage>* ReceiveUploadMessages(
-      ::grpc::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/)
-    #else
-    virtual ::grpc::experimental::ServerWriteReactor< ::sentry::InboundMessage>* ReceiveUploadMessages(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/)
-    #endif
-      { return nullptr; }
-  };
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_ReceiveTxMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    ExperimentalWithCallbackMethod_ReceiveTxMessages() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(9,
-          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::google::protobuf::Empty, ::sentry::InboundMessage>(
-            [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::google::protobuf::Empty* request) { return this->ReceiveTxMessages(context, request); }));
-    }
-    ~ExperimentalWithCallbackMethod_ReceiveTxMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveTxMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerWriteReactor< ::sentry::InboundMessage>* ReceiveTxMessages(
-      ::grpc::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/)
-    #else
-    virtual ::grpc::experimental::ServerWriteReactor< ::sentry::InboundMessage>* ReceiveTxMessages(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/)
+    virtual ::grpc::experimental::ServerWriteReactor< ::sentry::InboundMessage>* Messages(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::sentry::MessagesRequest* /*request*/)
     #endif
       { return nullptr; }
   };
   #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  typedef ExperimentalWithCallbackMethod_PenalizePeer<ExperimentalWithCallbackMethod_PeerMinBlock<ExperimentalWithCallbackMethod_SendMessageByMinBlock<ExperimentalWithCallbackMethod_SendMessageById<ExperimentalWithCallbackMethod_SendMessageToRandomPeers<ExperimentalWithCallbackMethod_SendMessageToAll<ExperimentalWithCallbackMethod_SetStatus<ExperimentalWithCallbackMethod_ReceiveMessages<ExperimentalWithCallbackMethod_ReceiveUploadMessages<ExperimentalWithCallbackMethod_ReceiveTxMessages<Service > > > > > > > > > > CallbackService;
+  typedef ExperimentalWithCallbackMethod_PenalizePeer<ExperimentalWithCallbackMethod_PeerMinBlock<ExperimentalWithCallbackMethod_SendMessageByMinBlock<ExperimentalWithCallbackMethod_SendMessageById<ExperimentalWithCallbackMethod_SendMessageToRandomPeers<ExperimentalWithCallbackMethod_SendMessageToAll<ExperimentalWithCallbackMethod_SetStatus<ExperimentalWithCallbackMethod_Messages<Service > > > > > > > > CallbackService;
   #endif
 
-  typedef ExperimentalWithCallbackMethod_PenalizePeer<ExperimentalWithCallbackMethod_PeerMinBlock<ExperimentalWithCallbackMethod_SendMessageByMinBlock<ExperimentalWithCallbackMethod_SendMessageById<ExperimentalWithCallbackMethod_SendMessageToRandomPeers<ExperimentalWithCallbackMethod_SendMessageToAll<ExperimentalWithCallbackMethod_SetStatus<ExperimentalWithCallbackMethod_ReceiveMessages<ExperimentalWithCallbackMethod_ReceiveUploadMessages<ExperimentalWithCallbackMethod_ReceiveTxMessages<Service > > > > > > > > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_PenalizePeer<ExperimentalWithCallbackMethod_PeerMinBlock<ExperimentalWithCallbackMethod_SendMessageByMinBlock<ExperimentalWithCallbackMethod_SendMessageById<ExperimentalWithCallbackMethod_SendMessageToRandomPeers<ExperimentalWithCallbackMethod_SendMessageToAll<ExperimentalWithCallbackMethod_SetStatus<ExperimentalWithCallbackMethod_Messages<Service > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_PenalizePeer : public BaseClass {
    private:
@@ -1253,58 +1065,24 @@ class Sentry final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::sentry::SetStatusReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_ReceiveMessages : public BaseClass {
+  class WithGenericMethod_Messages : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithGenericMethod_ReceiveMessages() {
+    WithGenericMethod_Messages() {
       ::grpc::Service::MarkMethodGeneric(7);
     }
-    ~WithGenericMethod_ReceiveMessages() override {
+    ~WithGenericMethod_Messages() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReceiveMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_ReceiveUploadMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_ReceiveUploadMessages() {
-      ::grpc::Service::MarkMethodGeneric(8);
-    }
-    ~WithGenericMethod_ReceiveUploadMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveUploadMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_ReceiveTxMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_ReceiveTxMessages() {
-      ::grpc::Service::MarkMethodGeneric(9);
-    }
-    ~WithGenericMethod_ReceiveTxMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveTxMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
+    ::grpc::Status Messages(::grpc::ServerContext* /*context*/, const ::sentry::MessagesRequest* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1441,7 +1219,7 @@ class Sentry final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::sentry::SetStatusReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1450,63 +1228,23 @@ class Sentry final {
     }
   };
   template <class BaseClass>
-  class WithRawMethod_ReceiveMessages : public BaseClass {
+  class WithRawMethod_Messages : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawMethod_ReceiveMessages() {
+    WithRawMethod_Messages() {
       ::grpc::Service::MarkMethodRaw(7);
     }
-    ~WithRawMethod_ReceiveMessages() override {
+    ~WithRawMethod_Messages() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReceiveMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
+    ::grpc::Status Messages(::grpc::ServerContext* /*context*/, const ::sentry::MessagesRequest* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestReceiveMessages(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestMessages(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncServerStreaming(7, context, request, writer, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_ReceiveUploadMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_ReceiveUploadMessages() {
-      ::grpc::Service::MarkMethodRaw(8);
-    }
-    ~WithRawMethod_ReceiveUploadMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveUploadMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestReceiveUploadMessages(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncServerStreaming(8, context, request, writer, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_ReceiveTxMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_ReceiveTxMessages() {
-      ::grpc::Service::MarkMethodRaw(9);
-    }
-    ~WithRawMethod_ReceiveTxMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveTxMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestReceiveTxMessages(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncServerStreaming(9, context, request, writer, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1762,7 +1500,7 @@ class Sentry final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::sentry::SetStatusReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1776,11 +1514,11 @@ class Sentry final {
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_ReceiveMessages : public BaseClass {
+  class ExperimentalWithRawCallbackMethod_Messages : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    ExperimentalWithRawCallbackMethod_ReceiveMessages() {
+    ExperimentalWithRawCallbackMethod_Messages() {
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       ::grpc::Service::
     #else
@@ -1794,97 +1532,21 @@ class Sentry final {
     #else
                    ::grpc::experimental::CallbackServerContext*
     #endif
-                     context, const::grpc::ByteBuffer* request) { return this->ReceiveMessages(context, request); }));
+                     context, const::grpc::ByteBuffer* request) { return this->Messages(context, request); }));
     }
-    ~ExperimentalWithRawCallbackMethod_ReceiveMessages() override {
+    ~ExperimentalWithRawCallbackMethod_Messages() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReceiveMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
+    ::grpc::Status Messages(::grpc::ServerContext* /*context*/, const ::sentry::MessagesRequest* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* ReceiveMessages(
+    virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* Messages(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
     #else
-    virtual ::grpc::experimental::ServerWriteReactor< ::grpc::ByteBuffer>* ReceiveMessages(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
-    #endif
-      { return nullptr; }
-  };
-  template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_ReceiveUploadMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    ExperimentalWithRawCallbackMethod_ReceiveUploadMessages() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(8,
-          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const::grpc::ByteBuffer* request) { return this->ReceiveUploadMessages(context, request); }));
-    }
-    ~ExperimentalWithRawCallbackMethod_ReceiveUploadMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveUploadMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* ReceiveUploadMessages(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
-    #else
-    virtual ::grpc::experimental::ServerWriteReactor< ::grpc::ByteBuffer>* ReceiveUploadMessages(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
-    #endif
-      { return nullptr; }
-  };
-  template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_ReceiveTxMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    ExperimentalWithRawCallbackMethod_ReceiveTxMessages() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(9,
-          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const::grpc::ByteBuffer* request) { return this->ReceiveTxMessages(context, request); }));
-    }
-    ~ExperimentalWithRawCallbackMethod_ReceiveTxMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status ReceiveTxMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* ReceiveTxMessages(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
-    #else
-    virtual ::grpc::experimental::ServerWriteReactor< ::grpc::ByteBuffer>* ReceiveTxMessages(
+    virtual ::grpc::experimental::ServerWriteReactor< ::grpc::ByteBuffer>* Messages(
       ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
     #endif
       { return nullptr; }
@@ -2059,10 +1721,10 @@ class Sentry final {
     WithStreamedUnaryMethod_SetStatus() {
       ::grpc::Service::MarkMethodStreamed(6,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::sentry::StatusData, ::google::protobuf::Empty>(
+          ::sentry::StatusData, ::sentry::SetStatusReply>(
             [this](::grpc_impl::ServerContext* context,
                    ::grpc_impl::ServerUnaryStreamer<
-                     ::sentry::StatusData, ::google::protobuf::Empty>* streamer) {
+                     ::sentry::StatusData, ::sentry::SetStatusReply>* streamer) {
                        return this->StreamedSetStatus(context,
                          streamer);
                   }));
@@ -2071,97 +1733,43 @@ class Sentry final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+    ::grpc::Status SetStatus(::grpc::ServerContext* /*context*/, const ::sentry::StatusData* /*request*/, ::sentry::SetStatusReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedSetStatus(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::sentry::StatusData,::google::protobuf::Empty>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedSetStatus(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::sentry::StatusData,::sentry::SetStatusReply>* server_unary_streamer) = 0;
   };
   typedef WithStreamedUnaryMethod_PenalizePeer<WithStreamedUnaryMethod_PeerMinBlock<WithStreamedUnaryMethod_SendMessageByMinBlock<WithStreamedUnaryMethod_SendMessageById<WithStreamedUnaryMethod_SendMessageToRandomPeers<WithStreamedUnaryMethod_SendMessageToAll<WithStreamedUnaryMethod_SetStatus<Service > > > > > > > StreamedUnaryService;
   template <class BaseClass>
-  class WithSplitStreamingMethod_ReceiveMessages : public BaseClass {
+  class WithSplitStreamingMethod_Messages : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithSplitStreamingMethod_ReceiveMessages() {
+    WithSplitStreamingMethod_Messages() {
       ::grpc::Service::MarkMethodStreamed(7,
         new ::grpc::internal::SplitServerStreamingHandler<
-          ::google::protobuf::Empty, ::sentry::InboundMessage>(
+          ::sentry::MessagesRequest, ::sentry::InboundMessage>(
             [this](::grpc_impl::ServerContext* context,
                    ::grpc_impl::ServerSplitStreamer<
-                     ::google::protobuf::Empty, ::sentry::InboundMessage>* streamer) {
-                       return this->StreamedReceiveMessages(context,
+                     ::sentry::MessagesRequest, ::sentry::InboundMessage>* streamer) {
+                       return this->StreamedMessages(context,
                          streamer);
                   }));
     }
-    ~WithSplitStreamingMethod_ReceiveMessages() override {
+    ~WithSplitStreamingMethod_Messages() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status ReceiveMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
+    ::grpc::Status Messages(::grpc::ServerContext* /*context*/, const ::sentry::MessagesRequest* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with split streamed
-    virtual ::grpc::Status StreamedReceiveMessages(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::google::protobuf::Empty,::sentry::InboundMessage>* server_split_streamer) = 0;
+    virtual ::grpc::Status StreamedMessages(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::sentry::MessagesRequest,::sentry::InboundMessage>* server_split_streamer) = 0;
   };
-  template <class BaseClass>
-  class WithSplitStreamingMethod_ReceiveUploadMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithSplitStreamingMethod_ReceiveUploadMessages() {
-      ::grpc::Service::MarkMethodStreamed(8,
-        new ::grpc::internal::SplitServerStreamingHandler<
-          ::google::protobuf::Empty, ::sentry::InboundMessage>(
-            [this](::grpc_impl::ServerContext* context,
-                   ::grpc_impl::ServerSplitStreamer<
-                     ::google::protobuf::Empty, ::sentry::InboundMessage>* streamer) {
-                       return this->StreamedReceiveUploadMessages(context,
-                         streamer);
-                  }));
-    }
-    ~WithSplitStreamingMethod_ReceiveUploadMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status ReceiveUploadMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with split streamed
-    virtual ::grpc::Status StreamedReceiveUploadMessages(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::google::protobuf::Empty,::sentry::InboundMessage>* server_split_streamer) = 0;
-  };
-  template <class BaseClass>
-  class WithSplitStreamingMethod_ReceiveTxMessages : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithSplitStreamingMethod_ReceiveTxMessages() {
-      ::grpc::Service::MarkMethodStreamed(9,
-        new ::grpc::internal::SplitServerStreamingHandler<
-          ::google::protobuf::Empty, ::sentry::InboundMessage>(
-            [this](::grpc_impl::ServerContext* context,
-                   ::grpc_impl::ServerSplitStreamer<
-                     ::google::protobuf::Empty, ::sentry::InboundMessage>* streamer) {
-                       return this->StreamedReceiveTxMessages(context,
-                         streamer);
-                  }));
-    }
-    ~WithSplitStreamingMethod_ReceiveTxMessages() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status ReceiveTxMessages(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::grpc::ServerWriter< ::sentry::InboundMessage>* /*writer*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with split streamed
-    virtual ::grpc::Status StreamedReceiveTxMessages(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::google::protobuf::Empty,::sentry::InboundMessage>* server_split_streamer) = 0;
-  };
-  typedef WithSplitStreamingMethod_ReceiveMessages<WithSplitStreamingMethod_ReceiveUploadMessages<WithSplitStreamingMethod_ReceiveTxMessages<Service > > > SplitStreamedService;
-  typedef WithStreamedUnaryMethod_PenalizePeer<WithStreamedUnaryMethod_PeerMinBlock<WithStreamedUnaryMethod_SendMessageByMinBlock<WithStreamedUnaryMethod_SendMessageById<WithStreamedUnaryMethod_SendMessageToRandomPeers<WithStreamedUnaryMethod_SendMessageToAll<WithStreamedUnaryMethod_SetStatus<WithSplitStreamingMethod_ReceiveMessages<WithSplitStreamingMethod_ReceiveUploadMessages<WithSplitStreamingMethod_ReceiveTxMessages<Service > > > > > > > > > > StreamedService;
+  typedef WithSplitStreamingMethod_Messages<Service > SplitStreamedService;
+  typedef WithStreamedUnaryMethod_PenalizePeer<WithStreamedUnaryMethod_PeerMinBlock<WithStreamedUnaryMethod_SendMessageByMinBlock<WithStreamedUnaryMethod_SendMessageById<WithStreamedUnaryMethod_SendMessageToRandomPeers<WithStreamedUnaryMethod_SendMessageToAll<WithStreamedUnaryMethod_SetStatus<WithSplitStreamingMethod_Messages<Service > > > > > > > > StreamedService;
 };
 
 }  // namespace sentry

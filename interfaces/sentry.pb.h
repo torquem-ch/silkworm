@@ -50,7 +50,7 @@ struct TableStruct_sentry_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[10]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[12]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -64,6 +64,9 @@ extern ForksDefaultTypeInternal _Forks_default_instance_;
 class InboundMessage;
 class InboundMessageDefaultTypeInternal;
 extern InboundMessageDefaultTypeInternal _InboundMessage_default_instance_;
+class MessagesRequest;
+class MessagesRequestDefaultTypeInternal;
+extern MessagesRequestDefaultTypeInternal _MessagesRequest_default_instance_;
 class OutboundMessageData;
 class OutboundMessageDataDefaultTypeInternal;
 extern OutboundMessageDataDefaultTypeInternal _OutboundMessageData_default_instance_;
@@ -85,6 +88,9 @@ extern SendMessageToRandomPeersRequestDefaultTypeInternal _SendMessageToRandomPe
 class SentPeers;
 class SentPeersDefaultTypeInternal;
 extern SentPeersDefaultTypeInternal _SentPeers_default_instance_;
+class SetStatusReply;
+class SetStatusReplyDefaultTypeInternal;
+extern SetStatusReplyDefaultTypeInternal _SetStatusReply_default_instance_;
 class StatusData;
 class StatusDataDefaultTypeInternal;
 extern StatusDataDefaultTypeInternal _StatusData_default_instance_;
@@ -92,6 +98,7 @@ extern StatusDataDefaultTypeInternal _StatusData_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::sentry::Forks* Arena::CreateMaybeMessage<::sentry::Forks>(Arena*);
 template<> ::sentry::InboundMessage* Arena::CreateMaybeMessage<::sentry::InboundMessage>(Arena*);
+template<> ::sentry::MessagesRequest* Arena::CreateMaybeMessage<::sentry::MessagesRequest>(Arena*);
 template<> ::sentry::OutboundMessageData* Arena::CreateMaybeMessage<::sentry::OutboundMessageData>(Arena*);
 template<> ::sentry::PeerMinBlockRequest* Arena::CreateMaybeMessage<::sentry::PeerMinBlockRequest>(Arena*);
 template<> ::sentry::PenalizePeerRequest* Arena::CreateMaybeMessage<::sentry::PenalizePeerRequest>(Arena*);
@@ -99,31 +106,49 @@ template<> ::sentry::SendMessageByIdRequest* Arena::CreateMaybeMessage<::sentry:
 template<> ::sentry::SendMessageByMinBlockRequest* Arena::CreateMaybeMessage<::sentry::SendMessageByMinBlockRequest>(Arena*);
 template<> ::sentry::SendMessageToRandomPeersRequest* Arena::CreateMaybeMessage<::sentry::SendMessageToRandomPeersRequest>(Arena*);
 template<> ::sentry::SentPeers* Arena::CreateMaybeMessage<::sentry::SentPeers>(Arena*);
+template<> ::sentry::SetStatusReply* Arena::CreateMaybeMessage<::sentry::SetStatusReply>(Arena*);
 template<> ::sentry::StatusData* Arena::CreateMaybeMessage<::sentry::StatusData>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace sentry {
 
 enum MessageId : int {
-  NewBlockHashes = 0,
-  NewBlock = 1,
-  Transactions = 2,
-  NewPooledTransactionHashes = 3,
-  GetBlockHeaders = 4,
-  GetBlockBodies = 5,
-  GetNodeData = 6,
-  GetReceipts = 7,
-  GetPooledTransactions = 8,
-  BlockHeaders = 9,
-  BlockBodies = 10,
-  NodeData = 11,
-  Receipts = 12,
-  PooledTransactions = 13,
+  STATUS_65 = 0,
+  GET_BLOCK_HEADERS_65 = 1,
+  BLOCK_HEADERS_65 = 2,
+  BLOCK_HASHES_65 = 3,
+  GET_BLOCK_BODIES_65 = 4,
+  BLOCK_BODIES_65 = 5,
+  GET_NODE_DATA_65 = 6,
+  NODE_DATA_65 = 7,
+  GET_RECEIPTS_65 = 8,
+  RECEIPTS_65 = 9,
+  NEW_BLOCK_HASHES_65 = 10,
+  NEW_BLOCK_65 = 11,
+  TRANSACTIONS_65 = 12,
+  NEW_POOLED_TRANSACTION_HASHES_65 = 13,
+  GET_POOLED_TRANSACTIONS_65 = 14,
+  POOLED_TRANSACTIONS_65 = 15,
+  STATUS_66 = 17,
+  NEW_BLOCK_HASHES_66 = 18,
+  NEW_BLOCK_66 = 19,
+  TRANSACTIONS_66 = 20,
+  NEW_POOLED_TRANSACTION_HASHES_66 = 21,
+  GET_BLOCK_HEADERS_66 = 22,
+  GET_BLOCK_BODIES_66 = 23,
+  GET_NODE_DATA_66 = 24,
+  GET_RECEIPTS_66 = 25,
+  GET_POOLED_TRANSACTIONS_66 = 26,
+  BLOCK_HEADERS_66 = 27,
+  BLOCK_BODIES_66 = 28,
+  NODE_DATA_66 = 29,
+  RECEIPTS_66 = 30,
+  POOLED_TRANSACTIONS_66 = 31,
   MessageId_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
   MessageId_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
 };
 bool MessageId_IsValid(int value);
-constexpr MessageId MessageId_MIN = NewBlockHashes;
-constexpr MessageId MessageId_MAX = PooledTransactions;
+constexpr MessageId MessageId_MIN = STATUS_65;
+constexpr MessageId MessageId_MAX = POOLED_TRANSACTIONS_66;
 constexpr int MessageId_ARRAYSIZE = MessageId_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MessageId_descriptor();
@@ -163,6 +188,31 @@ inline bool PenaltyKind_Parse(
     const std::string& name, PenaltyKind* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<PenaltyKind>(
     PenaltyKind_descriptor(), name, value);
+}
+enum Protocol : int {
+  ETH65 = 0,
+  ETH66 = 1,
+  Protocol_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  Protocol_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool Protocol_IsValid(int value);
+constexpr Protocol Protocol_MIN = ETH65;
+constexpr Protocol Protocol_MAX = ETH66;
+constexpr int Protocol_ARRAYSIZE = Protocol_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Protocol_descriptor();
+template<typename T>
+inline const std::string& Protocol_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, Protocol>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function Protocol_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    Protocol_descriptor(), enum_t_value);
+}
+inline bool Protocol_Parse(
+    const std::string& name, Protocol* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Protocol>(
+    Protocol_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -1831,6 +1881,289 @@ class StatusData PROTOBUF_FINAL :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_sentry_2eproto;
 };
+// -------------------------------------------------------------------
+
+class SetStatusReply PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:sentry.SetStatusReply) */ {
+ public:
+  inline SetStatusReply() : SetStatusReply(nullptr) {};
+  virtual ~SetStatusReply();
+
+  SetStatusReply(const SetStatusReply& from);
+  SetStatusReply(SetStatusReply&& from) noexcept
+    : SetStatusReply() {
+    *this = ::std::move(from);
+  }
+
+  inline SetStatusReply& operator=(const SetStatusReply& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline SetStatusReply& operator=(SetStatusReply&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const SetStatusReply& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SetStatusReply* internal_default_instance() {
+    return reinterpret_cast<const SetStatusReply*>(
+               &_SetStatusReply_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  friend void swap(SetStatusReply& a, SetStatusReply& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(SetStatusReply* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(SetStatusReply* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SetStatusReply* New() const final {
+    return CreateMaybeMessage<SetStatusReply>(nullptr);
+  }
+
+  SetStatusReply* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<SetStatusReply>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const SetStatusReply& from);
+  void MergeFrom(const SetStatusReply& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SetStatusReply* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "sentry.SetStatusReply";
+  }
+  protected:
+  explicit SetStatusReply(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_sentry_2eproto);
+    return ::descriptor_table_sentry_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kProtocolFieldNumber = 1,
+  };
+  // .sentry.Protocol protocol = 1;
+  void clear_protocol();
+  ::sentry::Protocol protocol() const;
+  void set_protocol(::sentry::Protocol value);
+  private:
+  ::sentry::Protocol _internal_protocol() const;
+  void _internal_set_protocol(::sentry::Protocol value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:sentry.SetStatusReply)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  int protocol_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sentry_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MessagesRequest PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:sentry.MessagesRequest) */ {
+ public:
+  inline MessagesRequest() : MessagesRequest(nullptr) {};
+  virtual ~MessagesRequest();
+
+  MessagesRequest(const MessagesRequest& from);
+  MessagesRequest(MessagesRequest&& from) noexcept
+    : MessagesRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline MessagesRequest& operator=(const MessagesRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MessagesRequest& operator=(MessagesRequest&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MessagesRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MessagesRequest* internal_default_instance() {
+    return reinterpret_cast<const MessagesRequest*>(
+               &_MessagesRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  friend void swap(MessagesRequest& a, MessagesRequest& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MessagesRequest* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MessagesRequest* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MessagesRequest* New() const final {
+    return CreateMaybeMessage<MessagesRequest>(nullptr);
+  }
+
+  MessagesRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MessagesRequest>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MessagesRequest& from);
+  void MergeFrom(const MessagesRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MessagesRequest* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "sentry.MessagesRequest";
+  }
+  protected:
+  explicit MessagesRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_sentry_2eproto);
+    return ::descriptor_table_sentry_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kIdsFieldNumber = 1,
+  };
+  // repeated .sentry.MessageId ids = 1;
+  int ids_size() const;
+  private:
+  int _internal_ids_size() const;
+  public:
+  void clear_ids();
+  private:
+  ::sentry::MessageId _internal_ids(int index) const;
+  void _internal_add_ids(::sentry::MessageId value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_ids();
+  public:
+  ::sentry::MessageId ids(int index) const;
+  void set_ids(int index, ::sentry::MessageId value);
+  void add_ids(::sentry::MessageId value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& ids() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_ids();
+
+  // @@protoc_insertion_point(class_scope:sentry.MessagesRequest)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int> ids_;
+  mutable std::atomic<int> _ids_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_sentry_2eproto;
+};
 // ===================================================================
 
 
@@ -3132,9 +3465,84 @@ inline void StatusData::set_max_block(::PROTOBUF_NAMESPACE_ID::uint64 value) {
   // @@protoc_insertion_point(field_set:sentry.StatusData.max_block)
 }
 
+// -------------------------------------------------------------------
+
+// SetStatusReply
+
+// .sentry.Protocol protocol = 1;
+inline void SetStatusReply::clear_protocol() {
+  protocol_ = 0;
+}
+inline ::sentry::Protocol SetStatusReply::_internal_protocol() const {
+  return static_cast< ::sentry::Protocol >(protocol_);
+}
+inline ::sentry::Protocol SetStatusReply::protocol() const {
+  // @@protoc_insertion_point(field_get:sentry.SetStatusReply.protocol)
+  return _internal_protocol();
+}
+inline void SetStatusReply::_internal_set_protocol(::sentry::Protocol value) {
+  
+  protocol_ = value;
+}
+inline void SetStatusReply::set_protocol(::sentry::Protocol value) {
+  _internal_set_protocol(value);
+  // @@protoc_insertion_point(field_set:sentry.SetStatusReply.protocol)
+}
+
+// -------------------------------------------------------------------
+
+// MessagesRequest
+
+// repeated .sentry.MessageId ids = 1;
+inline int MessagesRequest::_internal_ids_size() const {
+  return ids_.size();
+}
+inline int MessagesRequest::ids_size() const {
+  return _internal_ids_size();
+}
+inline void MessagesRequest::clear_ids() {
+  ids_.Clear();
+}
+inline ::sentry::MessageId MessagesRequest::_internal_ids(int index) const {
+  return static_cast< ::sentry::MessageId >(ids_.Get(index));
+}
+inline ::sentry::MessageId MessagesRequest::ids(int index) const {
+  // @@protoc_insertion_point(field_get:sentry.MessagesRequest.ids)
+  return _internal_ids(index);
+}
+inline void MessagesRequest::set_ids(int index, ::sentry::MessageId value) {
+  ids_.Set(index, value);
+  // @@protoc_insertion_point(field_set:sentry.MessagesRequest.ids)
+}
+inline void MessagesRequest::_internal_add_ids(::sentry::MessageId value) {
+  ids_.Add(value);
+}
+inline void MessagesRequest::add_ids(::sentry::MessageId value) {
+  // @@protoc_insertion_point(field_add:sentry.MessagesRequest.ids)
+  _internal_add_ids(value);
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>&
+MessagesRequest::ids() const {
+  // @@protoc_insertion_point(field_list:sentry.MessagesRequest.ids)
+  return ids_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+MessagesRequest::_internal_mutable_ids() {
+  return &ids_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+MessagesRequest::mutable_ids() {
+  // @@protoc_insertion_point(field_mutable_list:sentry.MessagesRequest.ids)
+  return _internal_mutable_ids();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -3169,6 +3577,11 @@ template <> struct is_proto_enum< ::sentry::PenaltyKind> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::sentry::PenaltyKind>() {
   return ::sentry::PenaltyKind_descriptor();
+}
+template <> struct is_proto_enum< ::sentry::Protocol> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::sentry::Protocol>() {
+  return ::sentry::Protocol_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

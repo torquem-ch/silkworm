@@ -26,7 +26,7 @@
 namespace silkworm {
 
 struct Link {
-    std::shared_ptr<Header> header;             // Header to which this link point to
+    std::shared_ptr<BlockHeader> header;        // Header to which this link point to
     BlockNum blockHeight;                       // Block height of the header, repeated here for convenience (remove?)
     Hash hash;                                  // Hash of the header
     std::vector<std::shared_ptr<Link>> next;    // Reverse of parentHash / Allows iteration over links in ascending block height order
@@ -80,11 +80,11 @@ class HeaderLogic {     // todo: modularize this!
   public:
     static const long soft_response_limit = 2 * 1024 * 1024; // Target maximum size of returned blocks, headers or node data.
     static const long est_header_rlp_size = 500;             // Approximate size of an RLP encoded block header
-    static const long max_header_fetch = 192;                // Amount of block headers to be fetched per retrieval request
+    static const long max_headers_serve = 1024;              // Amount of block headers to be fetched per retrieval request
 
     // Headers
-    static std::vector<Header> recoverByHash(Hash origin, uint64_t amount, uint64_t skip, bool reverse);
-    static std::vector<Header> recoverByNumber(BlockNum origin, uint64_t amount, uint64_t skip, bool reverse);
+    static std::vector<BlockHeader> recoverByHash(Hash origin, uint64_t amount, uint64_t skip, bool reverse);
+    static std::vector<BlockHeader> recoverByNumber(BlockNum origin, uint64_t amount, uint64_t skip, bool reverse);
 
     // Node current status
     static BlockNum                head_height(DbTx& db);

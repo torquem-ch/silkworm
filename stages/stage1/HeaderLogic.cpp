@@ -22,19 +22,19 @@
 namespace silkworm {
 
 
-std::vector<Header> HeaderLogic::recoverByHash(Hash origin, uint64_t amount, uint64_t skip, bool reverse) {
+std::vector<BlockHeader> HeaderLogic::recoverByHash(Hash origin, uint64_t amount, uint64_t skip, bool reverse) {
     using std::optional;
     uint64_t max_non_canonical = 100;
 
     DbTx& db = STAGE1.db_tx();  // todo: use singleton, is there a better way? HeaderLogic singleton?
 
-    std::vector<Header> headers;
+    std::vector<BlockHeader> headers;
     long long bytes = 0;
     Hash hash = origin;
     bool unknown = false;
 
     // first
-    optional<Header> header = db.read_header(hash);
+    optional<BlockHeader> header = db.read_header(hash);
     if (!header) return headers;
     BlockNum block_num = header->number;
     headers.push_back(*header);
@@ -87,22 +87,22 @@ std::vector<Header> HeaderLogic::recoverByHash(Hash origin, uint64_t amount, uin
         headers.push_back(*header);
         bytes += est_header_rlp_size;
 
-    } while(headers.size() < amount && bytes < soft_response_limit && headers.size() < max_header_fetch);
+    } while(headers.size() < amount && bytes < soft_response_limit && headers.size() < max_headers_serve);
 
     return headers;
 }
 
-std::vector<Header> HeaderLogic::recoverByNumber(BlockNum origin, uint64_t amount, uint64_t skip, bool reverse) {
+std::vector<BlockHeader> HeaderLogic::recoverByNumber(BlockNum origin, uint64_t amount, uint64_t skip, bool reverse) {
     using std::optional;
 
     DbTx& db = STAGE1.db_tx(); // todo: use singleton, is there a better way? HeaderLogic singleton?
 
-    std::vector<Header> headers;
+    std::vector<BlockHeader> headers;
     long long bytes = 0;
     BlockNum block_num = origin;
 
     do {
-        optional<Header> header = db.read_canonical_header(block_num);
+        optional<BlockHeader> header = db.read_canonical_header(block_num);
         if (!header) break;
 
         headers.push_back(*header);
@@ -113,7 +113,7 @@ std::vector<Header> HeaderLogic::recoverByNumber(BlockNum origin, uint64_t amoun
         else
             block_num -= skip + 1; // Number based traversal towards the genesis block
 
-    } while(block_num > 0 && headers.size() < amount && bytes < soft_response_limit && headers.size() < max_header_fetch);
+    } while(block_num > 0 && headers.size() < amount && bytes < soft_response_limit && headers.size() < max_headers_serve);
 
     return headers;
 }

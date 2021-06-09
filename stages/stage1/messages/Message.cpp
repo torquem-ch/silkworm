@@ -26,8 +26,12 @@ Message::~Message() {
 */
 
 std::ostream& operator<<(std::ostream& os, const silkworm::Message& msg) {
-    os << msg.name() << " content: " << msg.content();
+    os << msg.name() << ", content: " << msg.content();
     return os;
+}
+
+std::string identify(const silkworm::Message& message) {
+    return message.name() + " reqId=" + std::to_string(message.reqId());
 }
 
 }

@@ -13,22 +13,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef SILKWORM_OUTBOUNDMESSAGE_HPP
-#define SILKWORM_OUTBOUNDMESSAGE_HPP
 
-#include <memory>
-#include "Message.hpp"
+#ifndef SILKWORM_PEERMINBLOCK_HPP
+#define SILKWORM_PEERMINBLOCK_HPP
 
+#include "stages/stage1/SentryClient.hpp"
 
-namespace silkworm {
+namespace silkworm::rpc {
 
-class OutboundMessage : public Message {
+class PeerMinBlock: public rpc::AsyncUnaryCall<sentry::Sentry, sentry::PeerMinBlockRequest, google::protobuf::Empty> {
   public:
-    using request_call_t = rpc_t; // a more specific name
-    using request_calls_t = rpc_bundle_t;
+    PeerMinBlock(const std::string& peerId, BlockNum minBlock);
 
-    request_calls_t execute() override = 0;
+    using SentryRpc::on_receive_reply;
+
+    static auto make(const std::string& peerId, BlockNum minBlock)
+    {return std::make_shared<PeerMinBlock>(peerId, minBlock);}
 };
 
 }
-#endif  // SILKWORM_OUTBOUNDMESSAGE_HPP
+
+#endif  // SILKWORM_PEERMINBLOCK_HPP

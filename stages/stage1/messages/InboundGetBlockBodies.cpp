@@ -14,58 +14,67 @@
    limitations under the License.
 */
 
-#include "InboundGetBlockHeaders.hpp"
+#include "InboundGetBlockBodies.hpp"
 #include "stages/stage1/rpc/SendMessageById.hpp"
-#include "stages/stage1/HeaderLogic.hpp"
-#include "stages/stage1/packets/BlockHeadersPacket.hpp"
+#include "stages/stage1/BodyLogic.hpp"
+#include "stages/stage1/packets/BlockBodiesPacket.hpp"
+#include "stages/stage1/packets/RLPError.hpp"
+#include "stages/stage1/stage1.hpp"
 
 namespace silkworm {
 
 
-InboundGetBlockHeaders::InboundGetBlockHeaders(const sentry::InboundMessage& msg): InboundMessage() {
-    if (msg.id() != sentry::MessageId::GET_BLOCK_HEADERS_66)
-        throw std::logic_error("InboundGetBlockHeaders received wrong InboundMessage");
+InboundGetBlockBodies::InboundGetBlockBodies(const sentry::InboundMessage& msg): InboundMessage() {
+    if (msg.id() != sentry::MessageId::GET_BLOCK_BODIES_66)
+        throw std::logic_error("InboundGetBlockBodies received wrong InboundMessage");
 
     peerId_ = string_from_H512(msg.peer_id());
 
     ByteView data = byte_view_of_string(msg.data()); // copy for consumption
     rlp::DecodingResult err = rlp::decode(data, packet_);
     if (err != rlp::DecodingResult::kOk)
-        throw rlp::rlp_error("rlp decoding error decoding GetBlockHeaders");
+        throw rlp::rlp_error("rlp decoding error decoding GetBlockBodies");
 }
 
-InboundMessage::reply_calls_t InboundGetBlockHeaders::execute() {
+
+/*
+ // ReplyBlockBodiesRLP is the eth/66 version of SendBlockBodiesRLP.
+func (p *Peer) ReplyBlockBodiesRLP(id uint64, bodies []rlp.RawValue) error {
+	// Not packed into BlockBodiesPacket to avoid RLP decoding
+	return p2p.Send(p.rw, BlockBodiesMsg, BlockBodiesRLPPacket66{
+		RequestId:            id,
+		BlockBodiesRLPPacket: bodies,
+	})
+}
+ */
+InboundMessage::reply_calls_t InboundGetBlockBodies::execute() {
     using namespace std;
 
-    BlockHeadersPacket66 reply;
+    BlockBodiesPacket66 reply;
     reply.requestId = packet_.requestId;
-    if (holds_alternative<Hash>(packet_.request.origin))
-        reply.request = HeaderLogic::recoverByHash(get<Hash>(packet_.request.origin),
-            packet_.request.amount, packet_.request.skip, packet_.request.reverse);
-    else
-        reply.request = HeaderLogic::recoverByNumber(get<BlockNum>(packet_.request.origin),
-            packet_.request.amount, packet_.request.skip, packet_.request.reverse);
+    reply.request = BodyLogic::recover(STAGE1.db_tx(), packet_.request);
 
     Bytes rlp_encoding;
     rlp::encode(rlp_encoding, reply);
 
     auto msg_reply = std::make_unique<sentry::OutboundMessageData>();
-    msg_reply->set_id(sentry::MessageId::BLOCK_HEADERS_66);
+    msg_reply->set_id(sentry::MessageId::BLOCK_BODIES_66);
     msg_reply->set_data(rlp_encoding.data(), rlp_encoding.length()); // copy
 
     return {std::make_shared<rpc::SendMessageById>(peerId_, std::move(msg_reply))};
+
 }
 
-void InboundGetBlockHeaders::handle_completion(SentryRpc& reply) {
+void InboundGetBlockBodies::handle_completion(SentryRpc& reply) {
     [[maybe_unused]] auto& specific_reply = dynamic_cast<rpc::SendMessageById&>(reply);
     // todo: use specific_reply...
 }
 
-uint64_t InboundGetBlockHeaders::reqId() const {
+uint64_t InboundGetBlockBodies::reqId() const {
     return packet_.requestId;
 }
 
-std::string InboundGetBlockHeaders::content() const {
+std::string InboundGetBlockBodies::content() const {
     std::stringstream content;
     content << packet_;
     return content.str();

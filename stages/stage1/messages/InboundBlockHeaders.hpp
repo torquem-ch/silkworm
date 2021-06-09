@@ -13,22 +13,33 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef SILKWORM_OUTBOUNDMESSAGE_HPP
-#define SILKWORM_OUTBOUNDMESSAGE_HPP
 
-#include <memory>
-#include "Message.hpp"
+#ifndef SILKWORM_INBOUNDBLOCKHEADERS_HPP
+#define SILKWORM_INBOUNDBLOCKHEADERS_HPP
 
+#include "InboundMessage.hpp"
+#include "stages/stage1/packets/BlockHeadersPacket.hpp"
 
 namespace silkworm {
 
-class OutboundMessage : public Message {
-  public:
-    using request_call_t = rpc_t; // a more specific name
-    using request_calls_t = rpc_bundle_t;
 
-    request_calls_t execute() override = 0;
+class InboundBlockHeaders: public InboundMessage {
+  public:
+    InboundBlockHeaders(const sentry::InboundMessage& msg);
+
+    std::string name() const override {return "InboundBlockHeaders";}
+    std::string content() const override;
+    uint64_t reqId() const override;
+
+    reply_calls_t execute() override;
+
+    void handle_completion(SentryRpc&) override;
+
+  private:
+    std::string peerId_;
+    BlockHeadersPacket66 packet_;
 };
 
 }
-#endif  // SILKWORM_OUTBOUNDMESSAGE_HPP
+
+#endif  // SILKWORM_INBOUNDBLOCKHEADERS_HPP

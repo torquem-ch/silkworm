@@ -28,7 +28,7 @@ class SentryClient: public rpc::AsyncClient<sentry::Sentry> {
   public:
     using base_t = rpc::AsyncClient<sentry::Sentry>;
 
-    SentryClient(std::string sentry_addr):
+    explicit SentryClient(std::string sentry_addr):
         base_t(grpc::CreateChannel(sentry_addr, grpc::InsecureChannelCredentials()))
     {}
 

@@ -79,12 +79,25 @@ class DbTx {
         return {h.bytes, 32};
     }
 
-    std::optional<BlockHeader> read_header(Hash h) { // todo: add to db::access_layer.hpp?
+    std::optional<BlockNum> read_block_num(Hash h) { // todo: add to db::access_layer.hpp?
         auto blockhashes_table = txn->open(db::table::kHeaderNumbers);
         auto encoded_block_num = blockhashes_table->get(header_numbers_key(h));
         if (!encoded_block_num) return {};
         BlockNum block_num = boost::endian::load_big_u64(encoded_block_num->data());
-        return read_header(block_num, h);
+        return block_num;
+    }
+
+    std::optional<BlockHeader> read_header(Hash h) { // todo: add to db::access_layer.hpp?
+        auto block_num = read_block_num(h);
+        if (!block_num) return {};
+        return read_header(*block_num, h);
+    }
+
+    std::optional<BlockBody> read_body(Hash h) { // todo: add to db::access_layer.hpp?
+        auto block_num = read_block_num(h);
+        if (!block_num) return {};
+        bool read_senders = false;
+        return db::read_body(*txn, *block_num, h.bytes, read_senders);
     }
 
     std::optional<intx::uint256> read_total_difficulty(BlockNum b, Hash h) {
@@ -94,7 +107,6 @@ class DbTx {
     BlockNum stage_progress(const char* stage_name) {
         return db::stages::get_stage_progress(*txn, stage_name);
     }
-
 };
 
 #endif  // SILKWORM_DBTX_HPP

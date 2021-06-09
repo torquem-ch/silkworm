@@ -29,14 +29,15 @@ class InboundGetBlockHeaders: public InboundMessage {
 
     std::string name() const override {return "InboundGetBlockHeaders";}
     std::string content() const override;
+    uint64_t reqId() const override;
 
-    reply_call_t execute() override;
+    reply_calls_t execute() override;
 
     void handle_completion(SentryRpc&) override;
 
   private:
     std::string peerId_;
-    GetBlockHeadersPacket packet_;
+    GetBlockHeadersPacket66 packet_;
 };
 
 }

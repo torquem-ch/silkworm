@@ -19,21 +19,25 @@
 
 namespace silkworm {
 
-TEST_CASE("Types for gRPC") {
+TEST_CASE("H256/512 to/from conversions") {
     using namespace std;
 
-    Hash orig_hash = Hash::from_hex("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3");
-    Hash transf_hash = hash_from_H256(*to_H256(orig_hash));
+    SECTION( "H256 to/from Hash" ) {
+        Hash orig_hash = Hash::from_hex("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3");
+        Hash transf_hash = hash_from_H256(*to_H256(orig_hash));
 
-    REQUIRE(orig_hash == transf_hash);
+        REQUIRE(orig_hash == transf_hash);
+    }
 
-    intx::uint256 orig_big{intx::uint128(UINT64_MAX,67890),intx::uint128(12345,UINT64_MAX)};
-    intx::uint256 transf_big = uint256_from_H256(*to_H256(orig_big));
+    SECTION( "H256 to/from number" ) {
+        intx::uint256 orig_big{intx::uint128(UINT64_MAX, 67890), intx::uint128(12345, UINT64_MAX)};
+        intx::uint256 transf_big = uint256_from_H256(*to_H256(orig_big));
 
-    REQUIRE(orig_big == transf_big);
+        REQUIRE(orig_big == transf_big);
+    }
 
     for(auto len: {64,64,64,64,64,60,70}) {
-        SECTION( "string len="+to_string(len) ) {
+        SECTION( "H512 to/from string, len="+to_string(len) ) {
             string orig_string(len, 0);
             generate_n(orig_string.begin(), len, [] { return static_cast<char>(rand() % 255); });
 

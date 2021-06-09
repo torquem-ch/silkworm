@@ -21,7 +21,7 @@
 
 namespace silkworm::rpc {
 
-class ReceiveMessages: public rpc::AsyncOutStreamingCall<sentry::Sentry, google::protobuf::Empty, sentry::InboundMessage> {
+class ReceiveMessages: public rpc::AsyncOutStreamingCall<sentry::Sentry, sentry::MessagesRequest, sentry::InboundMessage> {
   public:
     ReceiveMessages();
 

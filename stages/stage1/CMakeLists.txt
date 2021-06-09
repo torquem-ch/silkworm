@@ -57,6 +57,7 @@ target_include_directories(silkworm_stage1 PUBLIC ${CMAKE_SOURCE_DIR}
                                                   messages
                                                   rpc)
 
+set_property(TARGET silkworm_stage1 PROPERTY CXX_STANDARD 20)
 
 # test
 find_package(Catch2 CONFIG REQUIRED)
@@ -67,8 +68,10 @@ add_executable(stage1_test "${CMAKE_SOURCE_DIR}/cmd/unit_test.cpp"
                             ${STAGE1_TESTS})
 target_link_libraries(stage1_test silkworm_stage1 Catch2::Catch2)
 
+set_property(TARGET stage1_test PROPERTY CXX_STANDARD 20)
+
 if(MSVC)
   target_compile_options(stage1_test PRIVATE /EHsc)
-else()
-  target_compile_options(stage1_test PRIVATE -fno-exceptions)
+#else()
+#  target_compile_options(stage1_test PRIVATE -fno-exceptions)
 endif()

@@ -28,12 +28,14 @@ class InboundNewBlockHashes: public InboundMessage {
 
     std::string name() const override {return "InboundNewBlockHashes";}
     std::string content() const override;
+    uint64_t reqId() const override;
 
-    reply_call_t execute() override;
+    reply_calls_t execute() override;
 
   private:
     std::string peerId_;
     NewBlockHashesPacket packet_;
+    uint64_t reqId_;
 };
 
 }

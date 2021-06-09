@@ -31,15 +31,18 @@ class SelfExtendingChain {  // tentative name - todo: improve!
     void top_seen_block_height(BlockNum n);
     BlockNum top_seen_block_height();
 
-    std::optional<GetBlockHeadersPacket> headers_forward(); // progresses Headers stage in the forward direction
-    void request_ack(GetBlockHeadersPacket packet, time_point_t tp, time_dur_t timeout);
+    std::optional<GetBlockHeadersPacket66> headers_forward(); // progresses Headers stage in the forward direction
+    void request_ack(GetBlockHeadersPacket66 packet, time_point_t tp, time_dur_t timeout);
+
+    void save_external_announce(Hash hash);
+    bool has_link(Hash hash);
 
   private:
     static constexpr BlockNum max_len = 192;
     static constexpr BlockNum stride = 8 * max_len;
 
-    std::optional<GetBlockHeadersPacket> request_more_headers();
-    std::optional<GetBlockHeadersPacket> request_skeleton();
+    std::optional<GetBlockHeadersPacket66> request_more_headers();
+    std::optional<GetBlockHeadersPacket66> request_skeleton();
 
     Oldest_First_Link_Queue persistedLinkQueue_;
     Youngest_First_Link_Queue linkQueue_;

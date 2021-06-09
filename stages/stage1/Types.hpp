@@ -20,23 +20,25 @@
 #include <silkworm/types/transaction.hpp>
 #include <silkworm/rlp/decode.hpp>
 #include <silkworm/rlp/encode.hpp>
+#include <silkworm/types/block.hpp>
 #include <boost/endian/conversion.hpp>
-using namespace silkworm;
-
+#include <iomanip>
 #include <chrono>
 
-class Hash: public evmc::bytes32 {
+namespace silkworm {
+
+class Hash : public evmc::bytes32 {
   public:
     using evmc::bytes32::bytes32;
 
     Hash() {}
-    Hash(ByteView bv) {std::memcpy(bytes, bv.data(), 32);}
+    Hash(ByteView bv) { std::memcpy(bytes, bv.data(), 32); }
 
-    operator Bytes() {return {bytes, 32};}
-    operator ByteView() {return {bytes, 32};}
+    operator Bytes() { return {bytes, 32}; }
+    operator ByteView() { return {bytes, 32}; }
 
-    uint8_t* raw_bytes() {return bytes;}
-    int length() {return 32;}
+    uint8_t* raw_bytes() { return bytes; }
+    int length() { return 32; }
 
     std::string to_hex() { return silkworm::to_hex(*this); }
     static Hash from_hex(std::string hex) { return Hash(evmc::literals::internal::from_hex<bytes32>(hex.c_str())); }
@@ -46,25 +48,20 @@ class Hash: public evmc::bytes32 {
 
 using Header = BlockHeader;
 using BlockNum = uint64_t;
-using BigInt = intx::uint256; // use intx::to_string, from_string, ...
+using BigInt = intx::uint256;  // use intx::to_string, from_string, ...
 
-//using Bytes = std::basic_string<uint8_t>; already defined elsewhere
-//using std::string to_hex(ByteView bytes);
-//using std::optional<Bytes> from_hex(std::string_view hex) noexcept;
-
+// using Bytes = std::basic_string<uint8_t>; already defined elsewhere
+// using std::string to_hex(ByteView bytes);
+// using std::optional<Bytes> from_hex(std::string_view hex) noexcept;
 
 using time_point_t = std::chrono::time_point<std::chrono::system_clock>;
 using time_dur_t = std::chrono::duration<std::chrono::system_clock>;
-
-#include <iomanip>
 
 inline ByteView byte_view_of_string(const std::string& s) {
     return {reinterpret_cast<const uint8_t*>(s.data()), s.length()};
 }
 
-inline Bytes bytes_of_string(const std::string& s) {
-    return Bytes(s.begin(), s.end());
-}
+inline Bytes bytes_of_string(const std::string& s) { return Bytes(s.begin(), s.end()); }
 
 inline std::ostream& operator<<(std::ostream& out, const silkworm::ByteView& bytes) {
     for (const auto& b : bytes) {
@@ -84,12 +81,15 @@ inline std::ostream& operator<<(std::ostream& out, const evmc::bytes32& b32) {
     return out;
 }
 
-inline void rlp_encode(Bytes& to, const Hash& h) {
-    rlp::encode(to, dynamic_cast<const evmc::bytes32&>(h));
+namespace rlp {
+    void encode(Bytes& to, const Hash& h);
+    rlp::DecodingResult decode(ByteView& from, Hash& to) noexcept;
+
+    template <class T> void encode_vec(Bytes& to, const std::vector<T>& v);
+    template <class T> size_t length_vec(const std::vector<T>& v);
+    template <class T> DecodingResult decode_vec(ByteView& from, std::vector<T>& to);
 }
 
-inline rlp::DecodingResult rlp_decode(ByteView& from, Hash& to) noexcept {
-    return rlp::decode(from, dynamic_cast<evmc::bytes32&>(to));
 }
 
 #endif  // SILKWORM_TYPES_HPP

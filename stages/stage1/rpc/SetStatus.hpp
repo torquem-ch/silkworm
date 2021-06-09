@@ -25,7 +25,7 @@
 
 namespace silkworm::rpc {
 
-class SetStatus : public rpc::AsyncUnaryCall<sentry::Sentry, sentry::StatusData, google::protobuf::Empty> {
+class SetStatus : public rpc::AsyncUnaryCall<sentry::Sentry, sentry::StatusData, sentry::SetStatusReply> {
   public:
     SetStatus(ChainConfig chain, Hash genesis, std::vector<BlockNum> hard_forks, Hash best_hash, BigInt total_difficulty);
 

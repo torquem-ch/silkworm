@@ -13,22 +13,18 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef SILKWORM_OUTBOUNDMESSAGE_HPP
-#define SILKWORM_OUTBOUNDMESSAGE_HPP
 
-#include <memory>
-#include "Message.hpp"
+#ifndef SILKWORM_RLPERROR_HPP
+#define SILKWORM_RLPERROR_HPP
 
+namespace silkworm::rlp {
 
-namespace silkworm {
-
-class OutboundMessage : public Message {
-  public:
-    using request_call_t = rpc_t; // a more specific name
-    using request_calls_t = rpc_bundle_t;
-
-    request_calls_t execute() override = 0;
-};
+    class rlp_error : public std::runtime_error {
+      public:
+        rlp_error() : std::runtime_error("rlp encoding/decoding error") {}
+        rlp_error(const std::string& description) : std::runtime_error(description) {}
+    };
 
 }
-#endif  // SILKWORM_OUTBOUNDMESSAGE_HPP
+
+#endif  // SILKWORM_RLPERROR_HPP

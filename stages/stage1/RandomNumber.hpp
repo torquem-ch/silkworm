@@ -13,22 +13,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef SILKWORM_OUTBOUNDMESSAGE_HPP
-#define SILKWORM_OUTBOUNDMESSAGE_HPP
 
-#include <memory>
-#include "Message.hpp"
-
+#ifndef SILKWORM_RANDOMNUMBER_HPP
+#define SILKWORM_RANDOMNUMBER_HPP
+#include <random>
+#include "Singleton.hpp"
 
 namespace silkworm {
 
-class OutboundMessage : public Message {
-  public:
-    using request_call_t = rpc_t; // a more specific name
-    using request_calls_t = rpc_bundle_t;
+class RandomNumber {
+    std::mt19937_64 generator_; // the 64-bit Mersenne Twister 19937 generator
+    std::uniform_int_distribution<unsigned long long> distr_; // a uniform distribution
 
-    request_calls_t execute() override = 0;
+  public:
+    RandomNumber() {
+        std::random_device rd;
+        generator_.seed(rd()); // init generator_ with a random seed
+    }
+
+    int64_t generate_one() {
+        return distr_(generator_);
+    }
+
 };
 
+#define RANDOM_NUMBER default_instantiating::Singleton<RandomNumber>::instance()
+
 }
-#endif  // SILKWORM_OUTBOUNDMESSAGE_HPP
+#endif  // SILKWORM_RANDOMNUMBER_HPP

@@ -33,6 +33,7 @@ namespace silkworm {
 
 struct BlockBody;
 struct BlockHeader;
+struct Block;
 struct Log;
 struct Receipt;
 struct AccessListEntry;
@@ -74,6 +75,7 @@ namespace rlp {
 
     void encode(Bytes& to, const BlockBody&);
     void encode(Bytes& to, const BlockHeader&, bool for_sealing = false);
+    void encode(Bytes& to, const Block&);
     void encode(Bytes& to, const Log&);
     void encode(Bytes& to, const Receipt&);
     void encode(Bytes& to, const AccessListEntry&);
@@ -88,6 +90,8 @@ namespace rlp {
     size_t length(const intx::uint256&);
 
     size_t length(const BlockHeader&);
+    size_t length(const BlockBody&);
+    size_t length(const Block&);
     size_t length(const Log&);
     size_t length(const AccessListEntry&);
     size_t length(const Transaction&);

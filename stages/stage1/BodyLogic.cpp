@@ -13,22 +13,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef SILKWORM_OUTBOUNDMESSAGE_HPP
-#define SILKWORM_OUTBOUNDMESSAGE_HPP
 
-#include <memory>
-#include "Message.hpp"
-
+#include "BodyLogic.hpp"
+#include <silkworm/types/block.hpp>
 
 namespace silkworm {
 
-class OutboundMessage : public Message {
-  public:
-    using request_call_t = rpc_t; // a more specific name
-    using request_calls_t = rpc_bundle_t;
-
-    request_calls_t execute() override = 0;
-};
+std::vector<BlockBody> BodyLogic::recover(DbTx& db, std::vector<Hash> request) {
+    std::vector<BlockBody> response;
+    size_t bytes = 0;
+    for(size_t i = 0; i <= request.size(); ++i) {
+        Hash& hash = request[i];
+        auto body = db.read_body(hash);
+        if (!body) continue;
+        response.push_back(*body);
+        bytes += rlp::length(*body);
+        if (bytes >= soft_response_limit ||
+            response.size() >= max_bodies_serve ||
+            i >= 2 * max_bodies_serve)
+            break;
+    }
+    return response;
+}
 
 }
-#endif  // SILKWORM_OUTBOUNDMESSAGE_HPP

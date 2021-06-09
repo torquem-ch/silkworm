@@ -22,21 +22,16 @@
 #include <silkworm/rlp/decode.hpp>
 #include <silkworm/rlp/encode.hpp>
 
-#include "Types.hpp"
+#include "stages/stage1/Types.hpp"
+#include "RLPError.hpp"
 
 namespace silkworm {
 
-// HashOrNumber type def
-using HashOrNumber = std::variant<Hash, BlockNum>;
+    // HashOrNumber type def
+    using HashOrNumber = std::variant<Hash, BlockNum>;
 
 // HashOrNumber rlp encoding/decoding
 namespace rlp {
-
-    class rlp_error : public std::runtime_error {
-      public:
-        rlp_error() : std::runtime_error("rlp encoding/decoding error") {}
-        rlp_error(const std::string& description) : std::runtime_error(description) {}
-    };
 
     inline void encode(Bytes& to, const HashOrNumber& from) {
         if (std::holds_alternative<Hash>(from))
@@ -53,21 +48,20 @@ namespace rlp {
     }
 
     inline DecodingResult decode(ByteView& from, HashOrNumber& to) noexcept {
-        ByteView copy(from);  // to decode but not consume
-        auto [h, err] = decode_header(copy);
-        if (err != DecodingResult::kOk) {
+        ByteView copy(from);    // a copy because we need only decode header and not consume it
+        auto [h, err] = decode_header(copy); // so we can use full implementation of decode below
+        if (err != DecodingResult::kOk)
             return err;
-        }
-
-        // uint8_t payload_length = from[0] - 0x80; // in the simple cases that we need here
+        if (h.list)
+            return DecodingResult::kUnexpectedList;
 
         if (h.payload_length == 32) {
             Hash hash;
-            err = rlp::decode(from, dynamic_cast<evmc::bytes32&>(hash));
+            err = rlp::decode(from, dynamic_cast<evmc::bytes32&>(hash));    // consume header
             to = hash;
         } else if (h.payload_length <= 8) {
-            BlockNum number;
-            err = rlp::decode(from, number);
+            BlockNum number{};
+            err = rlp::decode(from, number);    // consume header
             to = number;
         } else {
             err = DecodingResult::kUnexpectedLength;

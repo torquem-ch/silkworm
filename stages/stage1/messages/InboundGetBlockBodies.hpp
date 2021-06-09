@@ -14,29 +14,30 @@
    limitations under the License.
 */
 
-#ifndef SILKWORM_OUTBOUNDGETBLOCKHEADERS_HPP
-#define SILKWORM_OUTBOUNDGETBLOCKHEADERS_HPP
+#ifndef SILKWORM_INBOUNDGETBLOCKBODIES_HPP
+#define SILKWORM_INBOUNDGETBLOCKBODIES_HPP
 
-#include <stages/stage1/packets/GetBlockHeadersPacket.hpp>
-#include "OutboundMessage.hpp"
+#include "InboundMessage.hpp"
+#include "stages/stage1/packets/GetBlockBodiesPacket.hpp"
 
 namespace silkworm {
 
-class OutboundGetBlockHeaders : public OutboundMessage {
+class InboundGetBlockBodies: public InboundMessage {
   public:
-    OutboundGetBlockHeaders();
+    InboundGetBlockBodies(const sentry::InboundMessage& msg);
 
-    std::string name() const override {return "OutboundGetBlockHeaders";}
+    std::string name() const override {return "InboundGetBlockBodies";}
     std::string content() const override;
     uint64_t reqId() const override;
 
-    request_calls_t execute() override;
+    reply_calls_t execute() override;
 
     void handle_completion(SentryRpc&) override;
 
   private:
-    GetBlockHeadersPacket66 packet_;
+    std::string peerId_;
+    GetBlockBodiesPacket66 packet_;
 };
 
 }
-#endif  // SILKWORM_OUTBOUNDGETBLOCKHEADERS_HPP
+#endif  // SILKWORM_INBOUNDGETBLOCKBODIES_HPP

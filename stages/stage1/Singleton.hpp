@@ -38,4 +38,14 @@ class Singleton {
     static T& instance() {return *instance_;}
 };
 }
+
+namespace default_instantiating {
+template <class T>
+class Singleton {
+    static inline T instance_;
+  public:
+    static T& instance() {return instance_;}
+};
+}
+
 #endif  // SILKWORM_SINGLETON_HPP

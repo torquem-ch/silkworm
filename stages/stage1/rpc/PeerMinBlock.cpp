@@ -13,22 +13,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef SILKWORM_OUTBOUNDMESSAGE_HPP
-#define SILKWORM_OUTBOUNDMESSAGE_HPP
 
-#include <memory>
-#include "Message.hpp"
+#include "PeerMinBlock.hpp"
 
+namespace silkworm::rpc {
 
-namespace silkworm {
-
-class OutboundMessage : public Message {
-  public:
-    using request_call_t = rpc_t; // a more specific name
-    using request_calls_t = rpc_bundle_t;
-
-    request_calls_t execute() override = 0;
-};
+PeerMinBlock::PeerMinBlock(const std::string& peerId, BlockNum minBlock):
+    AsyncUnaryCall("PeerMinBlock", &sentry::Sentry::Stub::PrepareAsyncPeerMinBlock, {})
+{
+    request_.set_allocated_peer_id(to_H512(peerId).release());
+    request_.set_min_block(minBlock);  // take ownership
+}
 
 }
-#endif  // SILKWORM_OUTBOUNDMESSAGE_HPP

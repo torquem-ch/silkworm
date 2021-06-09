@@ -29,9 +29,7 @@ static const char* Sentry_method_names[] = {
   "/sentry.Sentry/SendMessageToRandomPeers",
   "/sentry.Sentry/SendMessageToAll",
   "/sentry.Sentry/SetStatus",
-  "/sentry.Sentry/ReceiveMessages",
-  "/sentry.Sentry/ReceiveUploadMessages",
-  "/sentry.Sentry/ReceiveTxMessages",
+  "/sentry.Sentry/Messages",
 };
 
 std::unique_ptr< Sentry::Stub> Sentry::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -48,9 +46,7 @@ Sentry::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   , rpcmethod_SendMessageToRandomPeers_(Sentry_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_SendMessageToAll_(Sentry_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_SetStatus_(Sentry_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ReceiveMessages_(Sentry_method_names[7], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
-  , rpcmethod_ReceiveUploadMessages_(Sentry_method_names[8], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
-  , rpcmethod_ReceiveTxMessages_(Sentry_method_names[9], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
+  , rpcmethod_Messages_(Sentry_method_names[7], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   {}
 
 ::grpc::Status Sentry::Stub::PenalizePeer(::grpc::ClientContext* context, const ::sentry::PenalizePeerRequest& request, ::google::protobuf::Empty* response) {
@@ -221,80 +217,48 @@ void Sentry::Stub::experimental_async::SendMessageToAll(::grpc::ClientContext* c
   return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::sentry::SentPeers>::Create(channel_.get(), cq, rpcmethod_SendMessageToAll_, context, request, false);
 }
 
-::grpc::Status Sentry::Stub::SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::google::protobuf::Empty* response) {
+::grpc::Status Sentry::Stub::SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::sentry::SetStatusReply* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SetStatus_, context, request, response);
 }
 
-void Sentry::Stub::experimental_async::SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+void Sentry::Stub::experimental_async::SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response, std::function<void(::grpc::Status)> f) {
   ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SetStatus_, context, request, response, std::move(f));
 }
 
-void Sentry::Stub::experimental_async::SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+void Sentry::Stub::experimental_async::SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SetStatusReply* response, std::function<void(::grpc::Status)> f) {
   ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SetStatus_, context, request, response, std::move(f));
 }
 
-void Sentry::Stub::experimental_async::SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+void Sentry::Stub::experimental_async::SetStatus(::grpc::ClientContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
   ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_SetStatus_, context, request, response, reactor);
 }
 
-void Sentry::Stub::experimental_async::SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::google::protobuf::Empty* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+void Sentry::Stub::experimental_async::SetStatus(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::sentry::SetStatusReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
   ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_SetStatus_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* Sentry::Stub::AsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::google::protobuf::Empty>::Create(channel_.get(), cq, rpcmethod_SetStatus_, context, request, true);
+::grpc::ClientAsyncResponseReader< ::sentry::SetStatusReply>* Sentry::Stub::AsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::sentry::SetStatusReply>::Create(channel_.get(), cq, rpcmethod_SetStatus_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* Sentry::Stub::PrepareAsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::google::protobuf::Empty>::Create(channel_.get(), cq, rpcmethod_SetStatus_, context, request, false);
+::grpc::ClientAsyncResponseReader< ::sentry::SetStatusReply>* Sentry::Stub::PrepareAsyncSetStatusRaw(::grpc::ClientContext* context, const ::sentry::StatusData& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::sentry::SetStatusReply>::Create(channel_.get(), cq, rpcmethod_SetStatus_, context, request, false);
 }
 
-::grpc::ClientReader< ::sentry::InboundMessage>* Sentry::Stub::ReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-  return ::grpc_impl::internal::ClientReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), rpcmethod_ReceiveMessages_, context, request);
+::grpc::ClientReader< ::sentry::InboundMessage>* Sentry::Stub::MessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request) {
+  return ::grpc_impl::internal::ClientReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), rpcmethod_Messages_, context, request);
 }
 
-void Sentry::Stub::experimental_async::ReceiveMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) {
-  ::grpc_impl::internal::ClientCallbackReaderFactory< ::sentry::InboundMessage>::Create(stub_->channel_.get(), stub_->rpcmethod_ReceiveMessages_, context, request, reactor);
+void Sentry::Stub::experimental_async::Messages(::grpc::ClientContext* context, ::sentry::MessagesRequest* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) {
+  ::grpc_impl::internal::ClientCallbackReaderFactory< ::sentry::InboundMessage>::Create(stub_->channel_.get(), stub_->rpcmethod_Messages_, context, request, reactor);
 }
 
-::grpc::ClientAsyncReader< ::sentry::InboundMessage>* Sentry::Stub::AsyncReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), cq, rpcmethod_ReceiveMessages_, context, request, true, tag);
+::grpc::ClientAsyncReader< ::sentry::InboundMessage>* Sentry::Stub::AsyncMessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq, void* tag) {
+  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), cq, rpcmethod_Messages_, context, request, true, tag);
 }
 
-::grpc::ClientAsyncReader< ::sentry::InboundMessage>* Sentry::Stub::PrepareAsyncReceiveMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), cq, rpcmethod_ReceiveMessages_, context, request, false, nullptr);
-}
-
-::grpc::ClientReader< ::sentry::InboundMessage>* Sentry::Stub::ReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-  return ::grpc_impl::internal::ClientReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), rpcmethod_ReceiveUploadMessages_, context, request);
-}
-
-void Sentry::Stub::experimental_async::ReceiveUploadMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) {
-  ::grpc_impl::internal::ClientCallbackReaderFactory< ::sentry::InboundMessage>::Create(stub_->channel_.get(), stub_->rpcmethod_ReceiveUploadMessages_, context, request, reactor);
-}
-
-::grpc::ClientAsyncReader< ::sentry::InboundMessage>* Sentry::Stub::AsyncReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), cq, rpcmethod_ReceiveUploadMessages_, context, request, true, tag);
-}
-
-::grpc::ClientAsyncReader< ::sentry::InboundMessage>* Sentry::Stub::PrepareAsyncReceiveUploadMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), cq, rpcmethod_ReceiveUploadMessages_, context, request, false, nullptr);
-}
-
-::grpc::ClientReader< ::sentry::InboundMessage>* Sentry::Stub::ReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request) {
-  return ::grpc_impl::internal::ClientReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), rpcmethod_ReceiveTxMessages_, context, request);
-}
-
-void Sentry::Stub::experimental_async::ReceiveTxMessages(::grpc::ClientContext* context, ::google::protobuf::Empty* request, ::grpc::experimental::ClientReadReactor< ::sentry::InboundMessage>* reactor) {
-  ::grpc_impl::internal::ClientCallbackReaderFactory< ::sentry::InboundMessage>::Create(stub_->channel_.get(), stub_->rpcmethod_ReceiveTxMessages_, context, request, reactor);
-}
-
-::grpc::ClientAsyncReader< ::sentry::InboundMessage>* Sentry::Stub::AsyncReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq, void* tag) {
-  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), cq, rpcmethod_ReceiveTxMessages_, context, request, true, tag);
-}
-
-::grpc::ClientAsyncReader< ::sentry::InboundMessage>* Sentry::Stub::PrepareAsyncReceiveTxMessagesRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), cq, rpcmethod_ReceiveTxMessages_, context, request, false, nullptr);
+::grpc::ClientAsyncReader< ::sentry::InboundMessage>* Sentry::Stub::PrepareAsyncMessagesRaw(::grpc::ClientContext* context, const ::sentry::MessagesRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::sentry::InboundMessage>::Create(channel_.get(), cq, rpcmethod_Messages_, context, request, false, nullptr);
 }
 
 Sentry::Service::Service() {
@@ -361,42 +325,22 @@ Sentry::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Sentry_method_names[6],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Sentry::Service, ::sentry::StatusData, ::google::protobuf::Empty>(
+      new ::grpc::internal::RpcMethodHandler< Sentry::Service, ::sentry::StatusData, ::sentry::SetStatusReply>(
           [](Sentry::Service* service,
              ::grpc_impl::ServerContext* ctx,
              const ::sentry::StatusData* req,
-             ::google::protobuf::Empty* resp) {
+             ::sentry::SetStatusReply* resp) {
                return service->SetStatus(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Sentry_method_names[7],
       ::grpc::internal::RpcMethod::SERVER_STREAMING,
-      new ::grpc::internal::ServerStreamingHandler< Sentry::Service, ::google::protobuf::Empty, ::sentry::InboundMessage>(
+      new ::grpc::internal::ServerStreamingHandler< Sentry::Service, ::sentry::MessagesRequest, ::sentry::InboundMessage>(
           [](Sentry::Service* service,
              ::grpc_impl::ServerContext* ctx,
-             const ::google::protobuf::Empty* req,
+             const ::sentry::MessagesRequest* req,
              ::grpc_impl::ServerWriter<::sentry::InboundMessage>* writer) {
-               return service->ReceiveMessages(ctx, req, writer);
-             }, this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      Sentry_method_names[8],
-      ::grpc::internal::RpcMethod::SERVER_STREAMING,
-      new ::grpc::internal::ServerStreamingHandler< Sentry::Service, ::google::protobuf::Empty, ::sentry::InboundMessage>(
-          [](Sentry::Service* service,
-             ::grpc_impl::ServerContext* ctx,
-             const ::google::protobuf::Empty* req,
-             ::grpc_impl::ServerWriter<::sentry::InboundMessage>* writer) {
-               return service->ReceiveUploadMessages(ctx, req, writer);
-             }, this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      Sentry_method_names[9],
-      ::grpc::internal::RpcMethod::SERVER_STREAMING,
-      new ::grpc::internal::ServerStreamingHandler< Sentry::Service, ::google::protobuf::Empty, ::sentry::InboundMessage>(
-          [](Sentry::Service* service,
-             ::grpc_impl::ServerContext* ctx,
-             const ::google::protobuf::Empty* req,
-             ::grpc_impl::ServerWriter<::sentry::InboundMessage>* writer) {
-               return service->ReceiveTxMessages(ctx, req, writer);
+               return service->Messages(ctx, req, writer);
              }, this)));
 }
 
@@ -445,28 +389,14 @@ Sentry::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status Sentry::Service::SetStatus(::grpc::ServerContext* context, const ::sentry::StatusData* request, ::google::protobuf::Empty* response) {
+::grpc::Status Sentry::Service::SetStatus(::grpc::ServerContext* context, const ::sentry::StatusData* request, ::sentry::SetStatusReply* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status Sentry::Service::ReceiveMessages(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::grpc::ServerWriter< ::sentry::InboundMessage>* writer) {
-  (void) context;
-  (void) request;
-  (void) writer;
-  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-}
-
-::grpc::Status Sentry::Service::ReceiveUploadMessages(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::grpc::ServerWriter< ::sentry::InboundMessage>* writer) {
-  (void) context;
-  (void) request;
-  (void) writer;
-  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-}
-
-::grpc::Status Sentry::Service::ReceiveTxMessages(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::grpc::ServerWriter< ::sentry::InboundMessage>* writer) {
+::grpc::Status Sentry::Service::Messages(::grpc::ServerContext* context, const ::sentry::MessagesRequest* request, ::grpc::ServerWriter< ::sentry::InboundMessage>* writer) {
   (void) context;
   (void) request;
   (void) writer;

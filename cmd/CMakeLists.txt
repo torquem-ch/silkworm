@@ -93,8 +93,9 @@ if(NOT SILKWORM_CORE_ONLY)
 
   find_package(gRPC CONFIG REQUIRED)
   add_executable(download_headers download_headers.cpp)
-  target_link_libraries(download_headers PRIVATE silkworm_db silkworm_tg_api silkworm_stage1 CLI11::CLI11)
+  target_link_libraries(download_headers PRIVATE silkworm_db silkworm_core silkworm_tg_api silkworm_stage1 CLI11::CLI11)
   target_include_directories(download_headers PRIVATE ${CMAKE_SOURCE_DIR})
+  set_property(TARGET download_headers PROPERTY CXX_STANDARD 20)
 
   # Ethereum Consensus Tests
   find_package(nlohmann_json CONFIG REQUIRED)
