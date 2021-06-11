@@ -23,7 +23,7 @@ StageResult stage_bodies(lmdb::DatabaseConfig) {
 }
 
 StageResult unwind_bodies(lmdb::DatabaseConfig, uint64_t) {
-    throw std::runtime_error("Not Implemented.");
+    return StageResult::kStageSuccess;
 }
 
 }

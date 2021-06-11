@@ -40,7 +40,7 @@ StageResult stage_senders(lmdb::DatabaseConfig db_config) {
     return farm.recover(block_from, block_to);
 }
 
-StageResult unwind_senders(lmdb::DatabaseConfig db_config, uint64_t unwind_point) {
+StageResult unwind_senders(lmdb::DatabaseConfig db_config, uint64_t unwind_to) {
     fs::path datadir(db_config.path);
     // Compute etl temporary path
     fs::path etl_path(datadir.parent_path() / fs::path("etl-temp"));
@@ -54,7 +54,7 @@ StageResult unwind_senders(lmdb::DatabaseConfig db_config, uint64_t unwind_point
     // Create farm instance and do work
     recovery::RecoveryFarm farm(*lmdb_txn, std::thread::hardware_concurrency(), kBatchSize, collector);
 
-    return farm.unwind(unwind_point);
+    return farm.unwind(unwind_to);
 }
 
 }
