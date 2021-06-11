@@ -35,7 +35,6 @@ void check_stagedsync_error(StageResult code);
 
 // Convert changesets key and value pair to plain state format
 std::pair<Bytes, Bytes> convert_to_db_format(const Bytes& key, const Bytes& value);
-
 }  // namespace silkworm::db
 
 #endif  // SILKWORM_DB_UTIL_HPP_
