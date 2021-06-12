@@ -205,6 +205,68 @@ void hashstate_promote(lmdb::Transaction* txn, HashstateOperation operation) {
     }
 }
 
+/*
+ *  If we have done hashstate before(not first sync),
+ *  We need to use changeset because we can use the progress system.
+ *  Note: Standard Promotion is way slower than Clean Promotion
+ */
+void hashstate_unwind(lmdb::Transaction* txn, HashstateOperation operation, uint64_t unwind_to) {
+    auto [changeset_config, target_config] = get_tables_for_promote(operation);
+    auto changeset_table{txn->open(changeset_config)};
+    auto plainstate_table{txn->open(db::table::kPlainState)};
+    auto codehash_table{txn->open(db::table::kPlainContractCode)};
+    auto target_table{txn->open(target_config)};
+    Bytes start_key(8, '\0');
+    boost::endian::store_big_u64(&start_key[0], unwind_to + 1);
+    MDB_val mdb_key{db::to_mdb_val(start_key)};
+    MDB_val mdb_data;
+    int rc{changeset_table->seek(&mdb_key, &mdb_data)};
+
+    while (!rc) {
+        Bytes mdb_key_as_bytes{db::from_mdb_val(mdb_key)};
+        Bytes mdb_value_as_bytes{db::from_mdb_val(mdb_data)};
+        auto [db_key, _]{convert_to_db_format(mdb_key_as_bytes, mdb_value_as_bytes)};
+        if (operation == HashstateOperation::HashAccount) {
+            // Hashing
+            auto hash{keccak256(db_key)};
+            target_table->del(full_view(hash.bytes));
+            rc = changeset_table->get_next(&mdb_key, &mdb_data);
+        } else if (operation == HashstateOperation::HashStorage) {
+            Bytes key(kHashLength * 2 + db::kIncarnationLength, '\0');
+            // Hashing
+            std::memcpy(&key[0], keccak256(db_key.substr(0, kAddressLength)).bytes, kHashLength);
+            std::memcpy(&key[kHashLength], &db_key[kAddressLength], db::kIncarnationLength);
+            std::memcpy(&key[kHashLength + db::kIncarnationLength],
+                        keccak256(db_key.substr(kAddressLength + db::kIncarnationLength)).bytes, kHashLength);
+            target_table->del(key);
+            rc = changeset_table->get_next(&mdb_key, &mdb_data);
+        } else {
+            // get incarnation
+            auto encoded_account{plainstate_table->get(db_key)};
+            if (encoded_account == std::nullopt) {
+                rc = changeset_table->get_next(&mdb_key, &mdb_data);
+                continue;
+            }
+            auto [incarnation, err]{extract_incarnation(*encoded_account)};
+            rlp::err_handler(err);
+            if (incarnation == 0) {
+                rc = changeset_table->get_next(&mdb_key, &mdb_data);
+                continue;
+            }
+            // get code hash
+            Bytes plain_key(kAddressLength + db::kIncarnationLength, '\0');
+            std::memcpy(&plain_key[0], &db_key[0], kAddressLength);
+            boost::endian::store_big_u64(&plain_key[kAddressLength], incarnation);
+            // Hash and concatenate everything together
+            Bytes key(kHashLength + db::kIncarnationLength, '\0');
+            std::memcpy(&key[0], keccak256(plain_key.substr(0, kAddressLength)).bytes, kHashLength);
+            std::memcpy(&key[kHashLength], &plain_key[kAddressLength], db::kIncarnationLength);
+            target_table->del(key);
+            rc = changeset_table->get_next(&mdb_key, &mdb_data);
+        }
+    }
+}
+
 StageResult stage_hashstate(lmdb::DatabaseConfig db_config) {
     fs::path datadir(db_config.path);
     fs::path etl_path(datadir.parent_path() / fs::path("etl-temp"));
@@ -235,7 +297,27 @@ StageResult stage_hashstate(lmdb::DatabaseConfig db_config) {
     return StageResult::kStageSuccess;
 }
 
-StageResult unwind_hashstate(lmdb::DatabaseConfig, uint64_t) {
-    throw std::runtime_error("Not Implemented.");
+StageResult unwind_hashstate(lmdb::DatabaseConfig db_config, uint64_t unwind_to) {
+    fs::path datadir(db_config.path);
+    fs::path etl_path(datadir.parent_path() / fs::path("etl-temp"));
+
+    std::shared_ptr<lmdb::Environment> env{lmdb::get_env(db_config)};
+    std::unique_ptr<lmdb::Transaction> txn{env->begin_rw_transaction()};
+
+    SILKWORM_LOG(LogLevel::Info) << "Unwinding HashState to block number:  " << unwind_to << std::endl;
+
+    if (unwind_to > db::stages::get_stage_progress(*txn, db::stages::kHashStateKey)) {
+            return StageResult::kStageSuccess;
+    }
+
+    hashstate_unwind(txn.get(), HashstateOperation::HashAccount, unwind_to);
+    hashstate_unwind(txn.get(), HashstateOperation::HashStorage, unwind_to);
+    hashstate_unwind(txn.get(), HashstateOperation::Code, unwind_to);
+    // Update progress height with last processed block
+    db::stages::set_stage_progress(*txn, db::stages::kHashStateKey, unwind_to);
+    lmdb::err_handler(txn->commit());
+    SILKWORM_LOG(LogLevel::Info) << "All Done!" << std::endl;
+
+    return StageResult::kStageSuccess;
 }
 }
