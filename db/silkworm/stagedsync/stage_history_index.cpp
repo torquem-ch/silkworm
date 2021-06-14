@@ -158,14 +158,132 @@ StageResult history_index_stage(lmdb::DatabaseConfig db_config, bool storage) {
     return StageResult::kStageSuccess;
 }
 
+void truncate_indexes(lmdb::Table* index_table, Bytes prefix, uint64_t unwind_to) {
+    Bytes prev_key{};
+    Bytes prev_bitmap{};
+    // End suffix is 0xffffffffffffffff
+    Bytes end_suffix(8, '\0');
+    boost::endian::store_big_u64(&end_suffix[0], UINT64_MAX);
+    MDB_val mdb_key{db::to_mdb_val(prefix)};
+    MDB_val mdb_data;
+    int rc{index_table->seek(&mdb_key, &mdb_data)};  // Sets cursor to nearest key greater equal than this
+    while (!rc) {                                        /* Loop as long as we have no errors*/
+        Bytes key{db::from_mdb_val(mdb_key)};
+        Bytes bitmap_bytes{db::from_mdb_val(mdb_key)};
+
+        uint64_t maximum{boost::endian::load_big_u64(&key[key.size() - 8])};
+        if (key.substr(0, key.size() - 8).compare(prefix) != 0) {
+            return;
+        }
+        if (unwind_to > maximum) {
+            // unwind point not yet reached
+            rc = index_table->get_next(&mdb_key, &mdb_data);
+            prev_key = key;
+            prev_bitmap = bitmap_bytes;
+            continue;
+        }
+        auto bm{roaring::Roaring64Map::readSafe(byte_ptr_cast(bitmap_bytes.data()), bitmap_bytes.size())};
+        bm &= roaring::Roaring64Map(roaring::api::roaring_bitmap_from_range(0, unwind_to, 1));
+        if (bm.cardinality() == 0) {
+            // delete all of the keys with the suffix
+            while(!rc) {
+                lmdb::err_handler(index_table->del_current());
+                rc = index_table->get_next(&mdb_key, &mdb_data);
+                auto next_key{db::from_mdb_val(mdb_key)};
+                if (next_key.substr(next_key.size() - 8).compare(end_suffix) != 0) {
+                    break;
+                }
+            }
+            lmdb::err_handler(rc);
+            if (prev_key.size() > 0) {
+                index_table->del(prev_key);
+                std::memcpy(&prev_key[prev_key.size() - 8], &end_suffix[0], 8);
+                index_table->put(prev_key, prev_bitmap);
+            }
+            return;
+        } else {
+            // delete all of the keys with the suffix
+            while(!rc) {
+                lmdb::err_handler(index_table->del_current());
+                rc = index_table->get_next(&mdb_key, &mdb_data);
+                auto next_key{db::from_mdb_val(mdb_key)};
+                if (next_key.substr(0, next_key.size() - 8).compare(prefix) != 0) {
+                    break;
+                }
+            }
+            lmdb::err_handler(rc);
+
+            Bytes new_bitmap_bytes(bm.getSizeInBytes(), '\0');
+            bm.write(byte_ptr_cast(&new_bitmap_bytes[0]));
+            std::memcpy(&key[key.size() - 8], &end_suffix[0], 8);
+            index_table->put(key, new_bitmap_bytes);
+            
+            return;
+        }
+    }
+    lmdb::err_handler(rc);
+}
+
+StageResult history_index_unwind(lmdb::DatabaseConfig db_config, uint64_t unwind_to, bool storage) {
+    fs::path datadir(db_config.path);
+    fs::path etl_path(datadir.parent_path() / fs::path("etl-temp"));
+    fs::create_directories(etl_path);
+    etl::Collector collector(etl_path.string().c_str(), /* flush size */ 512 * kMebi);
+
+    std::shared_ptr<lmdb::Environment> env{lmdb::get_env(db_config)};
+    std::unique_ptr<lmdb::Transaction> txn{env->begin_rw_transaction()};
+    // We take data from header table and transform it and put it in blockhashes table
+    lmdb::TableConfig changeset_config =
+        storage ? db::table::kPlainStorageChangeSet : db::table::kPlainAccountChangeSet;
+    lmdb::TableConfig index_config = storage ? db::table::kStorageHistory : db::table::kAccountHistory;
+    const char *stage_key = storage ? db::stages::kStorageHistoryIndexKey : db::stages::kAccountHistoryKey;
+    auto changeset_table{txn->open(changeset_config)};
+    auto index_table{txn->open(index_config)};
+    std::unordered_map<std::string, roaring::Roaring64Map> bitmaps;
+
+    if (unwind_to > db::stages::get_stage_progress(*txn, stage_key)) {
+        return StageResult::kStageSuccess;
+    }
+
+    // Extract
+    Bytes start(8, '\0');
+    boost::endian::store_big_u64(&start[0], unwind_to + 1);
+    MDB_val mdb_key{db::to_mdb_val(start)};
+    MDB_val mdb_data;
+
+    SILKWORM_LOG(LogLevel::Info) << "Started " << (storage ? "Storage" : "Account") << " Index Unwind " << "to block number: "
+                                    << unwind_to << std::endl;
+
+    int rc{changeset_table->seek(&mdb_key, &mdb_data)};  // Sets cursor to nearest key greater equal than this
+    while (!rc) {                                        /* Loop as long as we have no errors*/
+        if (storage) {
+            Bytes composite_key(kHashLength + kAddressLength, '\0');
+            std::memcpy(&composite_key[0], &static_cast<uint8_t *>(mdb_key.mv_data)[8], kAddressLength);
+            std::memcpy(&composite_key[kAddressLength], mdb_data.mv_data, kHashLength);
+            truncate_indexes(index_table.get(), composite_key, unwind_to);
+        } else {
+            Bytes composite_key(kAddressLength, '\0');
+            std::memcpy(&composite_key[0], &static_cast<uint8_t *>(mdb_data.mv_data)[0], kAddressLength);
+            truncate_indexes(index_table.get(), composite_key, unwind_to);
+        }
+    }
+
+    if (rc && rc != MDB_NOTFOUND) { /* MDB_NOTFOUND is not actually an error rather eof */
+        lmdb::err_handler(rc);
+    }
+
+    db::stages::set_stage_progress(*txn, stage_key, unwind_to);
+    lmdb::err_handler(txn->commit());
+
+    SILKWORM_LOG(LogLevel::Info) << "All Done" << std::endl;
+
+    return StageResult::kStageSuccess;
+}
+
 StageResult stage_account_history(lmdb::DatabaseConfig db_config) { return history_index_stage(db_config, false); }
 StageResult stage_storage_history(lmdb::DatabaseConfig db_config) { return history_index_stage(db_config, true); }
 
-StageResult unwind_account_history(lmdb::DatabaseConfig, uint64_t) {
-    throw std::runtime_error("Not Implemented.");
-}
+StageResult unwind_account_history(lmdb::DatabaseConfig db_config, uint64_t unwind_to) { return history_index_unwind(db_config, unwind_to, false); }
 
-StageResult unwind_storage_history(lmdb::DatabaseConfig, uint64_t) {
-    throw std::runtime_error("Not Implemented.");
-}
+StageResult unwind_storage_history(lmdb::DatabaseConfig db_config, uint64_t unwind_to) { return history_index_unwind(db_config, unwind_to, true); }
 }

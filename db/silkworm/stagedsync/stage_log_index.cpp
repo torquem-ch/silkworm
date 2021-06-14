@@ -149,8 +149,129 @@ StageResult stage_log_index(lmdb::DatabaseConfig db_config) {
     return StageResult::kStageSuccess;
 }
 
-StageResult unwind_log_index(lmdb::DatabaseConfig, uint64_t) {
-    throw std::runtime_error("Not Implemented.");
+void truncate_indexes(lmdb::Table* index_table, Bytes prefix, uint64_t unwind_to) {
+    Bytes prev_key{};
+    Bytes prev_bitmap{};
+    // End suffix is 0xffffffffffffffff
+    Bytes end_suffix(4, '\0');
+    boost::endian::store_big_u64(&end_suffix[0], UINT64_MAX);
+    MDB_val mdb_key{db::to_mdb_val(prefix)};
+    MDB_val mdb_data;
+    int rc{index_table->seek(&mdb_key, &mdb_data)};  // Sets cursor to nearest key greater equal than this
+    while (!rc) {                                        /* Loop as long as we have no errors*/
+        Bytes key{db::from_mdb_val(mdb_key)};
+        Bytes bitmap_bytes{db::from_mdb_val(mdb_key)};
+
+        uint64_t maximum{boost::endian::load_big_u32(&key[key.size() - 4])};
+        if (key.substr(0, key.size() - 8).compare(prefix) != 0) {
+            return;
+        }
+        if (unwind_to > maximum) {
+            // unwind point not yet reached
+            rc = index_table->get_next(&mdb_key, &mdb_data);
+            prev_key = key;
+            prev_bitmap = bitmap_bytes;
+            continue;
+        }
+        auto bm{roaring::Roaring::readSafe(byte_ptr_cast(bitmap_bytes.data()), bitmap_bytes.size())};
+        bm &= roaring::Roaring(roaring::api::roaring_bitmap_from_range(0, unwind_to, 1));
+        if (bm.cardinality() == 0) {
+            // delete all of the keys with the suffix
+            while(!rc) {
+                lmdb::err_handler(index_table->del_current());
+                rc = index_table->get_next(&mdb_key, &mdb_data);
+                auto next_key{db::from_mdb_val(mdb_key)};
+                if (next_key.substr(next_key.size() - 8).compare(end_suffix) != 0) {
+                    break;
+                }
+            }
+            lmdb::err_handler(rc);
+            if (prev_key.size() > 0) {
+                index_table->del(prev_key);
+                std::memcpy(&prev_key[prev_key.size() - 8], &end_suffix[0], 8);
+                index_table->put(prev_key, prev_bitmap);
+            }
+            return;
+        } else {
+            // delete all of the keys with the suffix
+            while(!rc) {
+                lmdb::err_handler(index_table->del_current());
+                rc = index_table->get_next(&mdb_key, &mdb_data);
+                auto next_key{db::from_mdb_val(mdb_key)};
+                if (next_key.substr(0, next_key.size() - 8).compare(prefix) != 0) {
+                    break;
+                }
+            }
+            lmdb::err_handler(rc);
+
+            Bytes new_bitmap_bytes(bm.getSizeInBytes(), '\0');
+            bm.write(byte_ptr_cast(&new_bitmap_bytes[0]));
+            std::memcpy(&key[key.size() - 8], &end_suffix[0], 8);
+            index_table->put(key, new_bitmap_bytes);
+            
+            return;
+        }
+    }
+    lmdb::err_handler(rc);
+}
+
+StageResult unwind_log_index(lmdb::DatabaseConfig db_config, uint64_t unwind_to) {
+    std::shared_ptr<lmdb::Environment> env{lmdb::get_env(db_config)};
+    std::unique_ptr<lmdb::Transaction> txn{env->begin_rw_transaction()};
+    // We take data from header table and transform it and put it in blockhashes table
+    auto log_table{txn->open(db::table::kLogs)};
+    auto log_addresses_table{txn->open(db::table::kLogAddressIndex, MDB_CREATE)};
+    auto log_topics_table{txn->open(db::table::kLogTopicIndex, MDB_CREATE)};
+    auto last_processed_block_number{db::stages::get_stage_progress(*txn, db::stages::kLogIndexKey)};
+    if (unwind_to > last_processed_block_number) {
+        return StageResult::kStageSuccess;
+    }
+    // Extract
+    Bytes start(8, '\0');
+    boost::endian::store_big_u64(&start[0], unwind_to+1);
+    MDB_val mdb_key{db::to_mdb_val(start)};
+    MDB_val mdb_data;
+
+    SILKWORM_LOG(LogLevel::Info) << "Started Log Index Extraction" << std::endl;
+    // addrs_allocated_space and topics_allocated_space are only used to initialize the listener
+    uint64_t addrs_allocated_space{0};
+    uint64_t topics_allocated_space{0};
+
+
+    std::unordered_map<std::string, roaring::Roaring> topic_bitmaps;
+    std::unordered_map<std::string, roaring::Roaring> addresses_bitmaps;
+
+    listener_log_index current_listener(unwind_to, &topic_bitmaps, &addresses_bitmaps, &topics_allocated_space,
+                                        &addrs_allocated_space);
+    int rc{log_table->seek(&mdb_key, &mdb_data)};  // Sets cursor to nearest key greater equal than this
+    while (!rc) {                                  /* Loop as long as we have no errors*/
+        current_listener.set_block_number(boost::endian::load_big_u64(static_cast<uint8_t *>(mdb_key.mv_data)));
+        cbor::input input(static_cast<uint8_t *>(mdb_data.mv_data), mdb_data.mv_size);
+        cbor::decoder decoder(input, current_listener);
+        decoder.run();
+        for (const auto &[key, _] : topic_bitmaps) {
+            truncate_indexes(log_topics_table.get(), Bytes(byte_ptr_cast(key.c_str()), key.size()), unwind_to);
+        }
+        topic_bitmaps.clear();
+        for (const auto &[key, _] : addresses_bitmaps) {
+            truncate_indexes(log_addresses_table.get(), Bytes(byte_ptr_cast(key.c_str()), key.size()), unwind_to);
+        }
+        addresses_bitmaps.clear();
+
+        rc = log_table->get_next(&mdb_key, &mdb_data);
+    }
+
+    if (rc && rc != MDB_NOTFOUND) { /* MDB_NOTFOUND is not actually an error rather eof */
+        lmdb::err_handler(rc);
+    }
+
+    // Update progress height with last processed block
+    db::stages::set_stage_progress(*txn, db::stages::kLogIndexKey, unwind_to);
+    lmdb::err_handler(txn->commit());
+    txn.reset();
+    SILKWORM_LOG(LogLevel::Info) << "All Done" << std::endl;
+
+    return StageResult::kStageSuccess;
 }
 
 }
