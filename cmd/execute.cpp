@@ -90,15 +90,13 @@ int main(int argc, char* argv[]) {
         uint64_t current_progress{previous_progress};
 
         for (uint64_t block_number{previous_progress + 1}; block_number <= to_block; ++block_number) {
-            int lmdb_error_code{MDB_SUCCESS};
-            SilkwormStatusCode status{silkworm_execute_blocks(*txn->handle(), chain_config->chain_id, block_number,
-                                                              to_block, *batch_size, write_receipts, &current_progress,
-                                                              &lmdb_error_code)};
-            if (status != SilkwormStatusCode::kSilkwormSuccess &&
-                status != SilkwormStatusCode::kSilkwormBlockNotFound) {
-                SILKWORM_LOG(LogLevel::Error) << "Error in silkworm_execute_blocks: " << magic_enum::enum_name(status)
+            auto [code, lmdb_error_code, current_progress] =
+                silkworm_execute_blocks(*txn->handle(), chain_config->chain_id, block_number, to_block, *batch_size,
+                                        write_receipts);
+            if (code != SilkwormStatusCode::kSilkwormSuccess && code != SilkwormStatusCode::kSilkwormBlockNotFound) {
+                SILKWORM_LOG(LogLevel::Error) << "Error in silkworm_execute_blocks: " << magic_enum::enum_name(code)
                                               << ", LMDB: " << lmdb_error_code << std::endl;
-                return magic_enum::enum_integer(status);
+                return magic_enum::enum_integer(code);
             }
 
             block_number = current_progress;
@@ -107,7 +105,7 @@ int main(int argc, char* argv[]) {
             lmdb::err_handler(txn->commit());
             txn.reset();
 
-            if (status == SilkwormStatusCode::kSilkwormBlockNotFound) {
+            if (code == SilkwormStatusCode::kSilkwormBlockNotFound) {
                 break;
             }
 

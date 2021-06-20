@@ -27,18 +27,21 @@
 #include <silkworm/db/buffer.hpp>
 #include <silkworm/execution/execution.hpp>
 
-SILKWORM_EXPORT SilkwormStatusCode silkworm_execute_blocks(MDB_txn* mdb_txn, uint64_t chain_id, uint64_t start_block,
-                                                           uint64_t max_block, uint64_t batch_size, bool write_receipts,
-                                                           uint64_t* last_executed_block,
-                                                           int* lmdb_error_code) SILKWORM_NOEXCEPT {
+SILKWORM_EXPORT SilkwormStatusData silkworm_execute_blocks(MDB_txn* mdb_txn, uint64_t chain_id, uint64_t start_block,
+                                                           uint64_t max_block, uint64_t batch_size,
+                                                           bool write_receipts) SILKWORM_NOEXCEPT {
     assert(mdb_txn);
+
+    SilkwormStatusData status_data = {
+        .code = SilkwormStatusCode::kSilkwormSuccess, .last_executed_block = 0, .lmdb_error_code = 0};
 
     using namespace silkworm;
 
     const ChainConfig* config{lookup_chain_config(chain_id)};
     if (!config) {
         SILKWORM_LOG(LogLevel::Error) << "Unsupported chain ID " << chain_id << std::endl;
-        return SilkwormStatusCode::kSilkwormUnknownChainId;
+        status_data.code = SilkwormStatusCode::kSilkwormUnknownChainId;
+        return status_data;
     }
 
     uint64_t block_num{start_block};
@@ -47,25 +50,6 @@ SILKWORM_EXPORT SilkwormStatusCode silkworm_execute_blocks(MDB_txn* mdb_txn, uin
         lmdb::Transaction txn{/*parent=*/nullptr, mdb_txn, /*flags=*/0};
         auto cleanup{gsl::finally([&txn] { *txn.handle() = nullptr; })};  // avoid aborting mdb_txn
 
-        if (write_receipts && (!db::migration_happened(txn, "receipts_cbor_encode") ||
-                               !db::migration_happened(txn, "receipts_store_logs_separately"))) {
-            SILKWORM_LOG(LogLevel::Error) << "Legacy stored receipts are not supported\n";
-            return SilkwormStatusCode::kSilkwormIncompatibleDbFormat;
-        }
-
-        // https://github.com/ledgerwatch/erigon/pull/1342
-        if (!db::migration_happened(txn, "acc_change_set_dup_sort_18") ||
-            !db::migration_happened(txn, "storage_change_set_dup_sort_22")) {
-            SILKWORM_LOG(LogLevel::Error) << "Legacy change sets are not supported\n";
-            return SilkwormStatusCode::kSilkwormIncompatibleDbFormat;
-        }
-
-        // https://github.com/ledgerwatch/erigon/pull/1358
-        if (!db::migration_happened(txn, "tx_table_4")) {
-            SILKWORM_LOG(LogLevel::Error) << "Legacy stored transactions are not supported\n";
-            return SilkwormStatusCode::kSilkwormIncompatibleDbFormat;
-        }
-
         db::Buffer buffer{&txn};
         AnalysisCache analysis_cache;
         ExecutionStatePool state_pool;
@@ -73,23 +57,23 @@ SILKWORM_EXPORT SilkwormStatusCode silkworm_execute_blocks(MDB_txn* mdb_txn, uin
         for (; block_num <= max_block; ++block_num) {
             std::optional<BlockWithHash> bh{db::read_block(txn, block_num, /*read_senders=*/true)};
             if (!bh) {
-                return SilkwormStatusCode::kSilkwormBlockNotFound;
+                status_data.code = SilkwormStatusCode::kSilkwormBlockNotFound;
+                return status_data;
             }
 
             auto [receipts, err]{execute_block(bh->block, buffer, *config, &analysis_cache, &state_pool)};
             if (err != ValidationResult::kOk) {
                 SILKWORM_LOG(LogLevel::Error)
                     << "Validation error " << static_cast<int>(err) << " at block " << block_num << std::endl;
-                return SilkwormStatusCode::kSilkwormInvalidBlock;
+                status_data.code = SilkwormStatusCode::kSilkwormInvalidBlock;
+                return status_data;
             }
 
             if (write_receipts) {
                 buffer.insert_receipts(block_num, receipts);
             }
 
-            if (last_executed_block) {
-                *last_executed_block = block_num;
-            }
+            status_data.last_executed_block = block_num;
 
             if (block_num % 1000 == 0) {
                 SILKWORM_LOG(LogLevel::Info) << "Blocks <= " << block_num << " executed" << std::endl;
@@ -97,27 +81,29 @@ SILKWORM_EXPORT SilkwormStatusCode silkworm_execute_blocks(MDB_txn* mdb_txn, uin
 
             if (buffer.current_batch_size() >= batch_size) {
                 buffer.write_to_db();
-                return SilkwormStatusCode::kSilkwormSuccess;
+                status_data.code = SilkwormStatusCode::kSilkwormSuccess;
+                return status_data;
             }
         };
 
         buffer.write_to_db();
-        return SilkwormStatusCode::kSilkwormSuccess;
-
+        return status_data;
     } catch (const lmdb::exception& e) {
-        if (lmdb_error_code) {
-            *lmdb_error_code = e.err();
-        }
+        status_data.lmdb_error_code = e.err();
         SILKWORM_LOG(LogLevel::Error) << "LMDB error " << e.what() << std::endl;
-        return SilkwormStatusCode::kSilkwormLmdbError;
+        status_data.code = SilkwormStatusCode::kSilkwormLmdbError;
+        return status_data;
     } catch (const db::MissingSenders&) {
         SILKWORM_LOG(LogLevel::Error) << "Missing or incorrect senders at block " << block_num << std::endl;
-        return SilkwormStatusCode::kSilkwormMissingSenders;
+        status_data.code = SilkwormStatusCode::kSilkwormMissingSenders;
+        return status_data;
     } catch (const rlp::DecodingError& ex) {
         SILKWORM_LOG(LogLevel::Error) << ex.what() << " at block " << block_num << std::endl;
-        return SilkwormStatusCode::kSilkwormDecodingError;
+        status_data.code = SilkwormStatusCode::kSilkwormDecodingError;
+        return status_data;
     } catch (...) {
         SILKWORM_LOG(LogLevel::Error) << "Unkown error at block " << block_num << std::endl;
-        return SilkwormStatusCode::kSilkwormUnknownError;
+        status_data.code = SilkwormStatusCode::kSilkwormUnknownError;
+        return status_data;
     }
 }

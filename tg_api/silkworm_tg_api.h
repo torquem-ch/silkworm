@@ -19,10 +19,9 @@
 
 // C API exported by Silkworm to be used in Erigon.
 
+#include <lmdb.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-#include <lmdb/lmdb.h>
 
 #if defined _MSC_VER
 #define SILKWORM_EXPORT __declspec(dllexport)
@@ -52,6 +51,14 @@ enum SilkwormStatusCode {
     kSilkwormUnknownError = -1
 };
 
+typedef enum SilkwormStatusCode SilkwormStatusCode_t;
+
+struct SilkwormStatusData {
+    SilkwormStatusCode_t code;
+    uint64_t last_executed_block;
+    int lmdb_error_code;
+};
+
 /** @brief Executes a batch of Ethereum blocks and writes resulting changes into the database.
  *
  * @param[in] txn Valid read-write LMDB transaction. Must not be NULL.
@@ -73,10 +80,9 @@ enum SilkwormStatusCode {
  * kSilkwormBlockNotFound is probably OK: it simply means that the execution reached the end of the chain
  * (blocks up to and incl. last_executed_block were still executed).
  */
-SILKWORM_EXPORT SilkwormStatusCode silkworm_execute_blocks(MDB_txn* txn, uint64_t chain_id, uint64_t start_block,
-                                                           uint64_t max_block, uint64_t batch_size, bool write_receipts,
-                                                           uint64_t* last_executed_block,
-                                                           int* lmdb_error_code) SILKWORM_NOEXCEPT;
+SILKWORM_EXPORT struct SilkwormStatusData silkworm_execute_blocks(MDB_txn* txn, uint64_t chain_id, uint64_t start_block,
+                                                                  uint64_t max_block, uint64_t batch_size,
+                                                                  bool write_receipts) SILKWORM_NOEXCEPT;
 
 #if __cplusplus
 }
