@@ -171,7 +171,7 @@ void walk_collect(mdbx::cursor& source, mdbx::cursor& plain_state_table, mdbx::c
 }
 
 void unwind_table_from(mdbx::cursor& table, Bytes& starting_key) {
-    if (table.seek(db::to_slice(starting_key))) {
+    if (table.lower_bound(db::to_slice(starting_key))) {
         table.erase();
         while (table.to_next(/*throw_notfound*/ false)) {
             table.erase();
