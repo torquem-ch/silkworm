@@ -72,8 +72,6 @@ class EVM {
 
     evmc::result call(const evmc_message& message) noexcept;
 
-    evmc_address recipient_of_call_message(const evmc_message& message) noexcept;
-
     evmc::result execute(const evmc_message& message, ByteView code, std::optional<evmc::bytes32> code_hash) noexcept;
 
     evmc_result execute_with_baseline_interpreter(evmc_revision rev, const evmc_message& message,
@@ -90,7 +88,7 @@ class EVM {
     const ChainConfig& config_;
     const Transaction* txn_{nullptr};
     std::vector<evmc::bytes32> block_hashes_{};
-    std::stack<evmc::address> address_stack_{};
+
     evmc_vm* evm1_{nullptr};
 };
 
