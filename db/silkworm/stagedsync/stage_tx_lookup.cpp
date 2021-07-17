@@ -60,7 +60,7 @@ StageResult stage_tx_lookup(db::EnvConfig db_config) {
 
     SILKWORM_LOG(LogLevel::Info) << "Started Tx Lookup Extraction" << std::endl;
 
-    auto bodies_data{bodies_table.find(db::to_slice(start), /*throw_notfound*/ false)};
+    auto bodies_data{bodies_table.lower_bound(db::to_slice(start), /*throw_notfound*/ false)};
     while (bodies_data) {
         auto body_rlp{db::from_slice(bodies_data.value)};
         auto body{db::detail::decode_stored_block_body(body_rlp)};
@@ -71,7 +71,7 @@ StageResult stage_tx_lookup(db::EnvConfig db_config) {
         if (body.txn_count) {
             Bytes tx_base_id(8, '\0');
             boost::endian::store_big_u64(tx_base_id.data(), body.base_txn_id);
-            auto tx_data{transactions_table.find(db::to_slice(tx_base_id), /*throw_notfound*/ false)};
+            auto tx_data{transactions_table.lower_bound(db::to_slice(tx_base_id), /*throw_notfound*/ false)};
             uint64_t tx_count{0};
 
             while (tx_data && tx_count < body.txn_count) {
@@ -127,6 +127,61 @@ StageResult stage_tx_lookup(db::EnvConfig db_config) {
     return StageResult::kStageSuccess;
 }
 
-StageResult unwind_tx_lookup() { throw std::runtime_error("Not Implemented."); }
+StageResult unwind_tx_lookup(db::EnvConfig db_config, uint64_t unwind_to) {
+    fs::path datadir(db_config.path);
+
+    auto env{db::open_env(db_config)};
+    auto txn{env.start_write()};
+
+    if (unwind_to >= db::stages::get_stage_progress(txn, db::stages::kTxLookupKey)) {
+        return StageResult::kStageSuccess;
+    }
+    // We take data from header table and transform it and put it in blockhashes table
+    auto bodies_table{db::open_cursor(txn, db::table::kBlockBodies)};
+    auto transactions_table{db::open_cursor(txn, db::table::kEthTx)};
+    auto lookup_table{db::open_cursor(txn, db::table::kTxLookup)};
+
+    // Extract
+    Bytes start(8, '\0');
+    boost::endian::store_big_u64(&start[0], unwind_to + 1);
+
+    SILKWORM_LOG(LogLevel::Info) << "Started Tx Lookup Unwind, from: " << db::stages::get_stage_progress(txn, db::stages::kTxLookupKey)
+        <<  " to: " << unwind_to << std::endl;
+
+    auto bodies_data{bodies_table.lower_bound(db::to_slice(start), /*throw_notfound*/ false)};
+    while (bodies_data) {
+        auto body_rlp{db::from_slice(bodies_data.value)};
+        auto body{db::detail::decode_stored_block_body(body_rlp)};
+
+        if (body.txn_count) {
+            Bytes tx_base_id(8, '\0');
+            boost::endian::store_big_u64(tx_base_id.data(), body.base_txn_id);
+            auto tx_data{transactions_table.lower_bound(db::to_slice(tx_base_id), /*throw_notfound*/ false)};
+            uint64_t tx_count{0};
+
+            while (tx_data && tx_count < body.txn_count) {
+                auto tx_view{db::from_slice(tx_data.value)};
+                auto hash{keccak256(tx_view)};
+                auto data{lookup_table.find(db::to_slice(hash.bytes), false)};
+                if (!data) {
+                    tx_data = transactions_table.to_next(/*throw_notfound*/ false);
+                    ++tx_count;
+                    continue;
+                }
+                lookup_table.erase();
+                ++tx_count;
+                tx_data = transactions_table.to_next(/*throw_notfound*/ false);
+            }
+        }
+
+        bodies_data = bodies_table.to_next(/*throw_notfound*/ false);
+    }
+
+
+    SILKWORM_LOG(LogLevel::Info) << "All Done" << std::endl;
+    db::stages::set_stage_progress(txn, db::stages::kTxLookupKey, unwind_to);
+    txn.commit();
+    return StageResult::kStageSuccess;
+}
 
 }  // namespace silkworm::stagedsync
