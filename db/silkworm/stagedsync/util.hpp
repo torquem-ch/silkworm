@@ -35,7 +35,7 @@ enum class [[nodiscard]] StageResult {
 void check_stagedsync_error(StageResult code);
 
 // Convert changesets key and value pair to plain state format
-std::pair<Bytes, Bytes> convert_to_db_format(const Bytes& key, const Bytes& value);
+std::pair<Bytes, Bytes> convert_to_db_format(const ByteView& key, const ByteView& value);
 
 }  // namespace silkworm::db
 

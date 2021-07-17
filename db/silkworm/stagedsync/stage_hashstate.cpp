@@ -41,8 +41,12 @@ std::pair<db::MapConfig, db::MapConfig> get_tables_for_promote(HashstateOperatio
             return {db::table::kPlainAccountChangeSet, db::table::kHashedAccounts};
         case HashstateOperation::HashStorage:
             return {db::table::kPlainStorageChangeSet, db::table::kHashedStorage};
-        default:
+        case HashstateOperation::Code:
             return {db::table::kPlainAccountChangeSet, db::table::kContractCode};
+        default:
+            std::string error{magic_enum::enum_name<HashstateOperation>(operation)};
+            error.append(": unknown operation");
+            throw std::runtime_error(error);
     }
 }
 /*
@@ -250,75 +254,76 @@ StageResult stage_hashstate(db::EnvConfig db_config) {
  *  Note: Standard Promotion is way slower than Clean Promotion
  */
 void hashstate_unwind(mdbx::txn& txn, uint64_t unwind_to, HashstateOperation operation) {
+
     auto [changeset_config, target_config] = get_tables_for_promote(operation);
 
     auto changeset_table{db::open_cursor(txn, changeset_config)};
     auto plainstate_table{db::open_cursor(txn, db::table::kPlainState)};
-    auto codehash_table{db::open_cursor(txn, db::table::kPlainContractCode)};
     auto target_table{db::open_cursor(txn, target_config)};
 
     Bytes start_key{db::block_key(unwind_to + 1)};
     auto changeset_data{changeset_table.lower_bound(db::to_slice(start_key), /*throw_notfound*/ false)};
-
-    while (changeset_data) {
-        Bytes mdb_key_as_bytes{db::from_slice(changeset_data.key)};
-        Bytes mdb_value_as_bytes{db::from_slice(changeset_data.value)};
-        auto [db_key, _]{convert_to_db_format(mdb_key_as_bytes, mdb_value_as_bytes)};
-        if (operation == HashstateOperation::HashAccount) {
-            // Hashing
-            auto hash{keccak256(db_key)};
-            auto data{target_table.find(db::to_slice(hash.bytes), /*throw_notfound*/ false)};
-            if (!data) {
-                changeset_data = changeset_table.to_next(false);
-                continue;
-            }
-            target_table.erase();
-            changeset_data = changeset_table.to_next(false);
-        } else if (operation == HashstateOperation::HashStorage) {
-            // We get storage value and hash its key.
-            Bytes key(kHashLength * 2 + db::kIncarnationLength, '\0');
-
-            // Hashing
-            std::memcpy(&key[0], keccak256(db_key.substr(0, kAddressLength)).bytes, kHashLength);
-            std::memcpy(&key[kHashLength], &db_key[kAddressLength], db::kIncarnationLength);
-            std::memcpy(&key[kHashLength + db::kIncarnationLength],
-                        keccak256(db_key.substr(kAddressLength + db::kIncarnationLength)).bytes, kHashLength);
-
-            auto data{target_table.find(db::to_slice(key), /*throw_notfound*/ false)};
-            if (!data) {
-                changeset_data = changeset_table.to_next(false);
-                continue;
-            }
-            target_table.erase();
-            changeset_data = changeset_table.to_next(false);
-
-        } else {
-            // get incarnation
-            auto encoded_account{plainstate_table.find(db::to_slice(db_key), false)};
-            if (!encoded_account) {
-                changeset_data = changeset_table.to_next(false);
-                continue;
-            }
-            auto [incarnation, err]{extract_incarnation(db::from_slice(encoded_account.value))};
-            rlp::err_handler(err);
-            if (incarnation == 0) {
-                changeset_data = changeset_table.to_next(false);
-                continue;
-            }
-
-            // Hash and concatenate everything together
-            Bytes key(kHashLength + db::kIncarnationLength, '\0');
-            std::memcpy(&key[0], keccak256(db_key.substr(0, kAddressLength)).bytes, kHashLength);
-            boost::endian::store_big_u64(&key[kHashLength], incarnation);
-            auto data{target_table.find(db::to_slice(key), /*throw_notfound*/ false)};
-            if (!data) {
-                changeset_data = changeset_table.to_next(false);
-                continue;
-            }
-            target_table.erase();
-            changeset_data = changeset_table.to_next(false);
-        }
+    if (!changeset_data) {
+        return;
     }
+
+    db::WalkFunc unwind_func;
+    switch (operation) {
+        case silkworm::stagedsync::HashstateOperation::HashAccount:
+            unwind_func = [&target_table](::mdbx::cursor::move_result data) -> bool {
+                auto [db_key, _]{convert_to_db_format(db::from_slice(data.key), db::from_slice(data.value))};
+                auto hash{keccak256(db_key)};
+                if (target_table.seek(db::to_slice(hash.bytes))) {
+                    target_table.erase();
+                }
+                return true;
+            };
+            break;
+        case silkworm::stagedsync::HashstateOperation::HashStorage:
+            unwind_func = [&target_table](::mdbx::cursor::move_result data) -> bool {
+                auto [db_key, _]{convert_to_db_format(db::from_slice(data.key), db::from_slice(data.value))};
+
+                // We get storage value and hash its key.
+                Bytes key(kHashLength * 2 + db::kIncarnationLength, '\0');
+                // Hashing
+                std::memcpy(&key[0], keccak256(db_key.substr(0, kAddressLength)).bytes, kHashLength);
+                std::memcpy(&key[kHashLength], &db_key[kAddressLength], db::kIncarnationLength);
+                std::memcpy(&key[kHashLength + db::kIncarnationLength],
+                            keccak256(db_key.substr(kAddressLength + db::kIncarnationLength)).bytes, kHashLength);
+                if (target_table.seek(db::to_slice(key))) {
+                    target_table.erase();
+                }
+                return true;
+            };
+            break;
+        case silkworm::stagedsync::HashstateOperation::Code:
+            unwind_func = [&target_table, &plainstate_table](::mdbx::cursor::move_result data) -> bool {
+                auto [db_key, _]{convert_to_db_format(db::from_slice(data.key), db::from_slice(data.value))};
+                // Get incarnation
+                auto encoded_account{plainstate_table.find(db::to_slice(db_key), false)};
+                if (encoded_account) {
+                    auto [incarnation, err]{extract_incarnation(db::from_slice(encoded_account.value))};
+                    rlp::err_handler(err);
+                    if (incarnation) {
+                        Bytes key(kHashLength + db::kIncarnationLength, '\0');
+                        std::memcpy(&key[0], keccak256(db_key.substr(0, kAddressLength)).bytes, kHashLength);
+                        boost::endian::store_big_u64(&key[kHashLength], incarnation);
+                        if (target_table.seek(db::to_slice(key))) {
+                            target_table.erase();
+                        }
+                    }
+                }
+                return true;
+            };
+            break;
+        default:
+            std::string error{magic_enum::enum_name<HashstateOperation>(operation)};
+            error.append(": unknown operation");
+            throw std::runtime_error(error);
+    }
+
+    (void)db::for_each(changeset_table, unwind_func);
+
 }
 
 StageResult unwind_hashstate(db::EnvConfig db_config, uint64_t unwind_to) {

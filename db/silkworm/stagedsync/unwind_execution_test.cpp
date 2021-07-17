@@ -130,7 +130,7 @@ TEST_CASE("Unwind Execution") {
     // Unwind second block and checks if state is first block
     // ---------------------------------------
     db_config.create = false;  // We have already created it
-    CHECK(stagedsync::unwind_execution(db_config, 1) == stagedsync::StageResult::kStageSuccess);
+    REQUIRE_NOTHROW(stagedsync::check_stagedsync_error(stagedsync::unwind_execution(db_config, 1)));
 
     auto env2{db::open_env(db_config)};
     auto txn2{env2.start_write()};
