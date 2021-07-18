@@ -17,6 +17,7 @@
 #ifndef SILKWORM_DB_BUFFER_HPP_
 #define SILKWORM_DB_BUFFER_HPP_
 
+#include <cassert>
 #include <optional>
 #include <vector>
 
@@ -35,8 +36,11 @@ namespace silkworm::db {
 
 class Buffer : public StateBuffer {
   public:
+    // txn must be valid (its handle != nullptr)
     explicit Buffer(mdbx::txn& txn, std::optional<uint64_t> historical_block = std::nullopt)
-        : txn_{txn}, historical_block_{historical_block} {}
+        : txn_{txn}, historical_block_{historical_block} {
+        assert(txn_);
+    }
 
     /** @name Readers */
     ///@{
